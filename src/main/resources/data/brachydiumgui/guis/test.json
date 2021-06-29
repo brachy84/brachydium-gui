@@ -1,0 +1,13 @@
+{
+  "id": "test:gui",
+  "root": {
+    "child": {
+      "id": "background",
+      "image": "brachydiumgui:icon",
+      "width": 64,
+      "height": 64,
+      "drawWidth": 128,
+      "drawHeight": 128
+    }
+  }
+}

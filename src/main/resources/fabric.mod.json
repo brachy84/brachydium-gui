@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "brachy84.brachydium.gui.BrachydiumGui"
+    ],
+    "kubejs-init": [
+      "brachy84.brachydium.gui.kubejs.KubeJsInit"
     ]
   },
   "mixins": [
