@@ -24,7 +24,7 @@ public final class AABB {
     }
 
     public static AABB of(Size size, Pos2d pos) {
-        return AABB.ltwh(pos.getX(), pos.getY(), size.width, size.height);
+        return AABB.ltwh(pos.getX(), pos.getY(), size.width(), size.height());
     }
 
     /**
