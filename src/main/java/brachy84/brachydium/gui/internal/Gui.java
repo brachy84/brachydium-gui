@@ -3,8 +3,11 @@ package brachy84.brachydium.gui.internal;
 import brachy84.brachydium.gui.api.ISyncedWidget;
 import brachy84.brachydium.gui.api.Interactable;
 import brachy84.brachydium.gui.api.math.AABB;
+import brachy84.brachydium.gui.api.math.Alignment;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
@@ -16,9 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 public class Gui {
+
+    public static Size getScreenSize() {
+        Window window = MinecraftClient.getInstance().getWindow();
+        return new Size(window.getScaledWidth(), window.getScaledHeight());
+    }
 
     private static final Map<Identifier, Gui> GUI_MAP = new HashMap<>();
 
@@ -31,25 +38,23 @@ public class Gui {
     }
 
     public final PlayerEntity player;
-    private Size screenSize;
-    private Widget root;
+    private RootWidget root;
     private ISyncedWidget[] syncedWidgets = {};
     private Interactable[] interactables = {};
 
-    public Gui(PlayerEntity player, Widget root) {
+    public Gui(PlayerEntity player, RootWidget root) {
         this.root = root;
         this.player = player;
     }
 
     @ApiStatus.Internal
     public void init() {
-        root.setLayer(0);
-        setLayers(0, root);
-        forEachWidget(root, widget -> widget.onInit(widget.getParent()));
+        root.init(0);
+
         AtomicInteger syncId = new AtomicInteger();
         List<ISyncedWidget> syncedWidgets = new ArrayList<>();
-        forEachWidget(root, widget -> {
-            if(widget instanceof ISyncedWidget) {
+        root.forAllChildren(widget -> {
+            if (widget instanceof ISyncedWidget) {
                 syncedWidgets.add((ISyncedWidget) widget);
                 ((ISyncedWidget) widget).assignId(syncId.getAndIncrement());
             }
@@ -62,33 +67,20 @@ public class Gui {
     }
 
     public void render(MatrixStack matrices, Pos2d mousePos, float delta) {
-        root.drawWidget(matrices, mousePos, delta, false);
+        root.draw(matrices, delta);
     }
 
-    public void renderForeground(MatrixStack matrices, Pos2d mousePos, float delta) {
-        root.drawWidget(matrices, mousePos, delta, true);
+    public void renderBackground(MatrixStack matrices, Pos2d mousePos, float delta) {
+        root.drawBackground(matrices, delta);
     }
 
-    public void resize(Size size) {
-        this.screenSize = size;
-        root.onScreenResize();
-    }
-
-    public void forEachWidget(Widget widget, Consumer<Widget> consumer) {
-        consumer.accept(widget);
-        widget.forEachChild(widget1 -> forEachWidget(widget1, consumer));
-    }
-
-    public void setLayers(int layer, Widget widget) {
-        layer += 1;
-        widget.setLayer(layer);
-        int finalLayer = layer;
-        widget.forEachChild(widget1 -> setLayers(finalLayer, widget1));
+    public void onScreenResize() {
+        root.forAllChildren(Widget::rePosition);
     }
 
     @Nullable
     public ISyncedWidget findSyncedWidget(int id) {
-        if(id > syncedWidgets.length) {
+        if (id > syncedWidgets.length) {
             throw new IllegalArgumentException(String.format("Can't find synced widget with id %s. Max is %s", id, syncedWidgets.length - 1));
         }
         return syncedWidgets[id];
@@ -100,8 +92,8 @@ public class Gui {
 
     public List<Widget> getSyncedWidgets(Class<?> clazz) {
         List<Widget> widgets = new ArrayList<>();
-        for(ISyncedWidget syncedWidget : syncedWidgets) {
-            if(syncedWidget.getClass().isAssignableFrom(clazz)) {
+        for (ISyncedWidget syncedWidget : syncedWidgets) {
+            if (syncedWidget.getClass().isAssignableFrom(clazz)) {
                 widgets.add((Widget) syncedWidget);
             }
         }
@@ -109,14 +101,10 @@ public class Gui {
     }
 
     public Interactable[] getInteractables() {
-        if(interactables.length == 0) {
+        if (interactables.length == 0) {
             interactables = getSyncedWidgets(Interactable.class).toArray(new Interactable[0]);
         }
         return interactables;
-    }
-
-    public Size getScreenSize() {
-        return screenSize;
     }
 
     public Size getGuiSize() {
@@ -124,7 +112,7 @@ public class Gui {
     }
 
     public Pos2d getGuiPos() {
-        return root.getAbsolutePos();
+        return root.getPos();
     }
 
     public AABB getBounds() {

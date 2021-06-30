@@ -5,6 +5,9 @@ import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
 import brachy84.brachydium.gui.internal.Widget;
 
+/**
+ * Center itself into the parent
+ */
 public class Centered extends Widget implements SingleChildWidget {
 
     public Centered(Size size) {

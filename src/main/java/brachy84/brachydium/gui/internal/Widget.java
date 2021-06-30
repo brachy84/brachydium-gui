@@ -4,6 +4,7 @@ import brachy84.brachydium.gui.api.math.AABB;
 import brachy84.brachydium.gui.api.math.Alignment;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
+import brachy84.brachydium.gui.api.widgets.MultiChildWidget;
 import brachy84.brachydium.gui.api.widgets.SingleChildWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.ApiStatus;
@@ -15,6 +16,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * This is the base of all widgets.
+ * A widget is an Element in a Gui. It does not necessarily draw anything
+ * onto the screen. It might just help organizing layouts and children
+ *
+ * @see SingleChildWidget
+ * @see MultiChildWidget
+ */
 public abstract class Widget {
 
     private Widget parent;
@@ -55,7 +64,7 @@ public abstract class Widget {
             this.pos = parent.pos.add(relativePos);
         }
         setPos(alignment.getAlignedPos(parent.size, size));
-        if(this instanceof SingleChildWidget widget && widget.mustHaveChild() && !hasChildren())
+        if (this instanceof SingleChildWidget widget && widget.mustHaveChild() && !hasChildren())
             throw new IllegalStateException("Widget is marked as 'mustHaveChild', but doesn't have a child");
         onInit();
         this.initialised = true;
@@ -65,9 +74,25 @@ public abstract class Widget {
     }
 
     @ApiStatus.Internal
+    public final void drawBackground(MatrixStack matrices, float delta) {
+        if(!isEnabled()) return;
+        RenderObject renderObject = getBackgroundRenderObject();
+        if (renderObject != null) {
+            matrices.push();
+            matrices.translate(0, 0, layer);
+            renderObject.render(matrices, delta);
+            matrices.pop();
+        }
+        for (Widget widget : children) {
+            widget.drawBackground(matrices, delta);
+        }
+    }
+
+    @ApiStatus.Internal
     public final void draw(MatrixStack matrices, float delta) {
+        if(!isEnabled()) return;
         RenderObject renderObject = getRenderObject();
-        if (isEnabled() && renderObject != null) {
+        if (renderObject != null) {
             matrices.push();
             matrices.translate(0, 0, layer);
             renderObject.render(matrices, delta);
@@ -76,6 +101,10 @@ public abstract class Widget {
         for (Widget widget : children) {
             widget.draw(matrices, delta);
         }
+    }
+
+    public void rePosition() {
+        setPos(alignment.getAlignedPos(parent.size, size));
     }
 
     public boolean hasChildren() {
@@ -102,12 +131,17 @@ public abstract class Widget {
         return null;
     }
 
+    @Nullable
+    public RenderObject getBackgroundRenderObject() {
+        return null;
+    }
+
     public List<Widget> getChildren() {
         return Collections.unmodifiableList(children);
     }
 
     protected void addChild(Widget widget) {
-        if(this instanceof SingleChildWidget && children.size() > 0)
+        if (this instanceof SingleChildWidget && children.size() > 0)
             throw new IllegalStateException("SingleChildWidget can only hold a single widget");
         this.children.add(Objects.requireNonNull(widget));
     }
@@ -126,6 +160,10 @@ public abstract class Widget {
 
     public Size getSize() {
         return size;
+    }
+
+    public AABB getBounds() {
+        return AABB.of(getSize(), getPos());
     }
 
     public Alignment getAlignment() {
@@ -161,9 +199,7 @@ public abstract class Widget {
     protected Widget setSize(Size size) {
         this.size = Objects.requireNonNull(size);
         if (initialised) {
-            forAllChildren(widget -> {
-                setPos(widget.alignment.getAlignedPos(widget.parent.size, widget.size));
-            });
+            forAllChildren(Widget::rePosition);
         }
         return this;
     }
@@ -171,9 +207,7 @@ public abstract class Widget {
     protected Widget setAlignment(Alignment alignment) {
         this.alignment = Objects.requireNonNull(alignment);
         if (initialised) {
-            forAllChildren(widget -> {
-                setPos(alignment.getAlignedPos(widget.parent.size, widget.size));
-            });
+            forAllChildren(Widget::rePosition);
         }
         return this;
     }

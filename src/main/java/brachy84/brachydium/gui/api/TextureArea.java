@@ -1,9 +1,15 @@
 package brachy84.brachydium.gui.api;
 
 import brachy84.brachydium.gui.api.math.AABB;
+import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
 import net.minecraft.util.Identifier;
 
+import java.awt.geom.Point2D;
+
+/**
+ * Defines an area in a png image
+ */
 public class TextureArea {
 
     /**
@@ -56,6 +62,10 @@ public class TextureArea {
 
     public TextureArea getSubArea(AABB bounds) {
         return getSubArea(bounds.x0, bounds.y0, bounds.x1, bounds.y1);
+    }
+
+    public TextureArea getSubArea(Pos2d pos, Size size) {
+        return getSubArea(AABB.of(size, pos));
     }
 
     public TextureArea getSubArea(float u0, float v0, float u1, float v1) {

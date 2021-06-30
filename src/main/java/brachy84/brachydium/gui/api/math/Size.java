@@ -1,6 +1,5 @@
 package brachy84.brachydium.gui.api.math;
 
-import brachy84.brachydium.gui.api.JsonReader;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
