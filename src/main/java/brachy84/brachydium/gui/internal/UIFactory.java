@@ -1,17 +1,20 @@
-package brachy84.brachydium.gui.internal.old;
+package brachy84.brachydium.gui.internal;
 
 import brachy84.brachydium.gui.BrachydiumGui;
 import brachy84.brachydium.gui.api.UIHolder;
 import brachy84.brachydium.gui.UiFactoryRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.OptionalInt;
 
 public abstract class UIFactory<T extends UIHolder> {
 
@@ -24,7 +27,7 @@ public abstract class UIFactory<T extends UIHolder> {
 
     public final Identifier id;
 
-    public UIFactory(Identifier id) {
+    protected UIFactory(Identifier id) {
         this.id = id;
     }
 
@@ -32,15 +35,19 @@ public abstract class UIFactory<T extends UIHolder> {
         if(!uiHolder.hasUI()) return;
         BrachydiumGui.LOGGER.info("Building UI");
 
-        OptionalInt optionalInt = player.openHandledScreen(GuiScreenHandler.createFactory(uiHolder));
-        if(optionalInt.isPresent()) {
-            int syncId = optionalInt.getAsInt();
-            holderCache.put(syncId, uiHolder);
-        }
+        UiHandler.openGui(player, uiHolder.createUi(player));
+
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeIdentifier(getId());
+        writeHolderToSyncData(buf, uiHolder);
+        ServerPlayNetworking.send(player, UI_SYNC_ID, buf);
     }
 
+    @ApiStatus.Internal
     @Environment(EnvType.CLIENT)
-    public final void openClientUi(UIHolder uiHolder, int syncId) {
+    public final void openClientUi(UIHolder uiHolder) {
+        Gui gui = uiHolder.createUi(MinecraftClient.getInstance().player);
+        MinecraftClient.getInstance().openScreen(new GuiScreen(gui));
     }
 
     public Identifier getId() {
@@ -59,7 +66,7 @@ public abstract class UIFactory<T extends UIHolder> {
             UIFactory<?> factory = UiFactoryRegistry.tryGet(factoryId);
             if (factory != null) {
                 UIHolder holder = factory.readHolderFromSyncData(buf);
-                factory.openClientUi(holder, buf.readInt());
+                factory.openClientUi(holder);
             }
         }
     }

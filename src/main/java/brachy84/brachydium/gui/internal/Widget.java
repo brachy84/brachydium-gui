@@ -1,6 +1,7 @@
 package brachy84.brachydium.gui.internal;
 
 import brachy84.brachydium.gui.api.IGuiHelper;
+import brachy84.brachydium.gui.api.WidgetTag;
 import brachy84.brachydium.gui.api.math.AABB;
 import brachy84.brachydium.gui.api.math.Alignment;
 import brachy84.brachydium.gui.api.math.Pos2d;
@@ -30,6 +31,7 @@ public abstract class Widget {
     private Gui gui;
     private Widget parent;
     private final List<Widget> children = new ArrayList<>();
+    private final List<WidgetTag> tags = new ArrayList<>();
     private int layer;
     private Pos2d pos;
     private Pos2d relativePos;
@@ -79,7 +81,7 @@ public abstract class Widget {
 
     @ApiStatus.Internal
     public final void drawForeground(MatrixStack matrices, float delta) {
-        if(!isEnabled()) return;
+        if (!isEnabled()) return;
         RenderObject renderObject = getForegroundRenderObject();
         if (renderObject != null) {
             matrices.push();
@@ -94,7 +96,7 @@ public abstract class Widget {
 
     @ApiStatus.Internal
     public final void draw(MatrixStack matrices, Pos2d mousePos, float delta) {
-        if(!isEnabled()) return;
+        if (!isEnabled()) return;
         this.guiHelper = GuiHelper.create(layer, mousePos);
         RenderObject renderObject = getRenderObject();
         if (renderObject != null) {
@@ -131,6 +133,9 @@ public abstract class Widget {
     public void onInit() {
     }
 
+    public void onDestroy() {
+    }
+
     @Nullable
     public RenderObject getRenderObject() {
         return null;
@@ -145,10 +150,36 @@ public abstract class Widget {
         return Collections.unmodifiableList(children);
     }
 
+    /**
+     * This is the only way to add widgets outside if this class
+     *
+     * @param widget to add
+     * @throws IllegalArgumentException if the widget is a {@link RootWidget} or a {@link CursorSlotWidget}
+     * @throws IllegalStateException    if this is a {@link SingleChildWidget} and it already has a child
+     * @throws IllegalStateException    if the widget is already initialised
+     */
     protected void addChild(Widget widget) {
+        if(initialised)
+            throw new IllegalStateException("Can't add children after initialised");
+        if (widget instanceof CursorSlotWidget || widget instanceof RootWidget)
+            throw new IllegalArgumentException("CursorSlot or RootWidgets can't be added");
         if (this instanceof SingleChildWidget && children.size() > 0)
             throw new IllegalStateException("SingleChildWidget can only hold a single widget");
         this.children.add(Objects.requireNonNull(widget));
+    }
+
+    public Widget addTag(WidgetTag tag) {
+        for(WidgetTag tag1 : tags) {
+            if(!tag.getCompatPredicate().test(tag1)) {
+                throw new IllegalArgumentException("WidgetTags are incompatible");
+            }
+        }
+        tags.add(tag);
+        return this;
+    }
+
+    public boolean hasTag(WidgetTag tag) {
+        return tags.contains(tag);
     }
 
     public Widget getParent() {

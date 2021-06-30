@@ -1,6 +1,7 @@
 package brachy84.brachydium.gui.api;
 
 import brachy84.brachydium.gui.Networking;
+import brachy84.brachydium.gui.internal.UiHandler;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -17,17 +18,6 @@ import org.jetbrains.annotations.ApiStatus;
  * see also: {@link Interactable}
  */
 public interface ISyncedWidget {
-
-    /**
-     * @return the id associated with this widget
-     */
-    int getWidgetId();
-
-    /**
-     * This should only be called internally during screen init
-     */
-    @ApiStatus.Internal
-    void assignId(int id);
 
     /**
      * This methods handles data reading
@@ -55,7 +45,7 @@ public interface ISyncedWidget {
      */
     default void sendToClient(ServerPlayerEntity player) {
         PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeInt(getWidgetId());
+        buf.writeInt(UiHandler.getCurrentGui(player).findIdForSyncedWidget(this));
         writeData(buf);
         ServerPlayNetworking.send(player, Networking.WIDGET_UPDATE, buf);
     }
@@ -69,7 +59,7 @@ public interface ISyncedWidget {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player != null) {
             PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeInt(getWidgetId());
+            buf.writeInt(UiHandler.getCurrentGui(player).findIdForSyncedWidget(this));
             writeData(buf);
             ClientPlayNetworking.send(Networking.WIDGET_UPDATE, buf);
         }

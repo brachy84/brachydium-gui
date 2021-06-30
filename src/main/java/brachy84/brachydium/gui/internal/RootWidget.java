@@ -9,11 +9,9 @@ import net.minecraft.entity.player.PlayerEntity;
 
 public final class RootWidget extends Widget implements MultiChildWidget {
 
-    private static final Widget DUMMY_PARENT = new Widget() {
-    };
-
     public RootWidget(Size size, Alignment alignment) {
-
+        super(size, Pos2d.ZERO);
+        setAlignment(alignment);
     }
 
     public RootWidget(Size size, Pos2d pos) {
@@ -25,10 +23,6 @@ public final class RootWidget extends Widget implements MultiChildWidget {
 
     public Gui createGui(PlayerEntity player) {
         return new Gui(player, this);
-    }
-
-    protected void init(Gui gui, int layer) {
-        init(gui, DUMMY_PARENT, layer);
     }
 
     @Override

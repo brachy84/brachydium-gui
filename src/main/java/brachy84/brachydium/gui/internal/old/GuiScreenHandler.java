@@ -3,6 +3,7 @@ package brachy84.brachydium.gui.internal.old;
 import brachy84.brachydium.gui.BrachydiumGui;
 import brachy84.brachydium.gui.api.UIHolder;
 import brachy84.brachydium.gui.internal.Gui;
+import brachy84.brachydium.gui.internal.UIFactory;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;

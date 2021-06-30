@@ -8,6 +8,10 @@ import net.minecraft.client.util.InputUtil;
 import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * An interface that handles user interactions.
+ * These methods get called on the Server
+ */
 public interface Interactable extends ISyncedWidget {
 
     /**

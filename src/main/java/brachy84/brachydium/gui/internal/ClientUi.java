@@ -4,7 +4,6 @@ import brachy84.brachydium.gui.Networking;
 import brachy84.brachydium.gui.api.ISyncedWidget;
 import brachy84.brachydium.gui.internal.old.GuiHandledScreen;
 import brachy84.brachydium.gui.internal.old.GuiScreenHandler;
-import brachy84.brachydium.gui.internal.old.UIFactory;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -23,9 +22,7 @@ public class ClientUi {
             return new GuiHandledScreen(screenHandler, inv);
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(UIFactory.UI_SYNC_ID, (client, handler, buf, responseSender) -> {
-            UIFactory.SyncPacket.read(buf);
-        });
+        ClientPlayNetworking.registerGlobalReceiver(UIFactory.UI_SYNC_ID, (client, handler, buf, responseSender) -> UIFactory.SyncPacket.read(buf));
 
         ClientPlayNetworking.registerGlobalReceiver(Networking.WIDGET_UPDATE, ((client, handler, buf, responseSender) -> {
             ISyncedWidget syncedWidget = getSyncedWidget(buf);

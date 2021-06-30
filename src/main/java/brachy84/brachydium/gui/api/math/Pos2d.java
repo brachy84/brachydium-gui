@@ -31,6 +31,10 @@ public class Pos2d {
         return new Pos2d(x + p.x, y + p.y);
     }
 
+    public Pos2d add(float x, float y) {
+        return new Pos2d(x + this.x, y + this.y);
+    }
+
     public Pos2d subtract(Pos2d p) {
         return new Pos2d(x - p.x, y - p.y);
     }

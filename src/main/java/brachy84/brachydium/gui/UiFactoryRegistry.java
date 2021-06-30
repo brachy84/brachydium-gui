@@ -1,6 +1,6 @@
 package brachy84.brachydium.gui;
 
-import brachy84.brachydium.gui.internal.old.UIFactory;
+import brachy84.brachydium.gui.internal.UIFactory;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import net.minecraft.util.Identifier;

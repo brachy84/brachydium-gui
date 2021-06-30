@@ -1,6 +1,7 @@
 package brachy84.brachydium.gui.internal;
 
 import brachy84.brachydium.gui.Networking;
+import brachy84.brachydium.gui.api.ISyncedWidget;
 import brachy84.brachydium.gui.api.Interactable;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -15,12 +16,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class GuiScreen extends Screen implements GuiHelper {
 
     private final Gui gui;
-    private final List<Interactable> interactables = new ArrayList<>();
+    private final Interactable[] interactables;
     private Interactable focused;
 
     protected GuiScreen(Gui gui) {
@@ -28,6 +30,7 @@ public class GuiScreen extends Screen implements GuiHelper {
         this.gui = gui;
         this.gui.setScreen(this);
         this.gui.init();
+        interactables = gui.getInteractables();
     }
 
     @Override
@@ -44,11 +47,20 @@ public class GuiScreen extends Screen implements GuiHelper {
         gui.renderForeground(matrices, pos, delta);
     }
 
+    public <T extends Widget & Interactable> List<T> getMatchingInteractables(Predicate<T> predicate) {
+        List<T> interactables = new ArrayList<>();
+        for(Interactable interactable : this.interactables) {
+            if(predicate.test((T) interactable)) {
+                interactables.add((T) interactable);
+            }
+        }
+        return interactables;
+    }
+
     @Nullable
     public Interactable getHoveredInteractable(Pos2d pos) {
         Interactable topWidget = null;
-        for (Interactable interactable : interactables.stream().filter(interactable ->
-                interactable.isMouseOver(pos)).collect(Collectors.toSet())) {
+        for (Interactable interactable : getMatchingInteractables(widget -> widget.isMouseOver(pos) && widget.isEnabled())) {
             if (interactable instanceof Widget widget) {
                 if (topWidget == null) {
                     topWidget = interactable;
@@ -62,8 +74,12 @@ public class GuiScreen extends Screen implements GuiHelper {
         return topWidget;
     }
 
-    public int getInteractableId(Interactable interactable) {
-        return interactable.getWidgetId();
+    public int getSyncedId(ISyncedWidget syncedWidget) {
+        return gui.findIdForSyncedWidget(syncedWidget);
+    }
+
+    public int getFocusedId() {
+        return getSyncedId(focused);
     }
 
     public void setFocused(Interactable interactable) {
@@ -85,7 +101,7 @@ public class GuiScreen extends Screen implements GuiHelper {
         Interactable focused = getHoveredInteractable(pos);
         if (focused != null) {
             PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeInt(focused.getWidgetId());
+            buf.writeInt(getFocusedId());
             buf.writeDouble(mouseX);
             buf.writeDouble(mouseY);
             buf.writeInt(button);
@@ -103,7 +119,7 @@ public class GuiScreen extends Screen implements GuiHelper {
         Interactable focused = getHoveredInteractable(pos);
         if (focused != null) {
             PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeInt(focused.getWidgetId());
+            buf.writeInt(getFocusedId());
             buf.writeDouble(mouseX);
             buf.writeDouble(mouseY);
             buf.writeInt(button);
@@ -119,7 +135,7 @@ public class GuiScreen extends Screen implements GuiHelper {
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (this.getFocusedWidget() != null && this.isDragging()) {
             PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeInt(focused.getWidgetId());
+            buf.writeInt(getFocusedId());
             buf.writeDouble(mouseX);
             buf.writeDouble(mouseY);
             buf.writeInt(button);
@@ -137,7 +153,7 @@ public class GuiScreen extends Screen implements GuiHelper {
         Interactable focused = getHoveredInteractable(pos);
         if (focused != null) {
             PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeInt(focused.getWidgetId());
+            buf.writeInt(getFocusedId());
             buf.writeDouble(mouseX);
             buf.writeDouble(mouseY);
             buf.writeDouble(amount);

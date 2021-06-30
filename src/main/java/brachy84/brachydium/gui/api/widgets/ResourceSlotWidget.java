@@ -26,7 +26,6 @@ import java.util.List;
 public abstract class ResourceSlotWidget<T> extends Widget implements Interactable {
 
     private final List<TextureArea> textures = new ArrayList<>();
-    private final List<String> tags = new ArrayList<>();
 
     public ResourceSlotWidget(AABB bounds) {
         super(bounds);
@@ -114,25 +113,6 @@ public abstract class ResourceSlotWidget<T> extends Widget implements Interactab
      */
     public ResourceSlotWidget<T> addBackgroundSprites(TextureArea... sprite) {
         textures.addAll(Arrays.asList(sprite));
-        return this;
-    }
-
-    /**
-     * Tags provide an easy way to find specific slots in a gui
-     * @param tag to check for
-     * @return if the slot has the tag
-     */
-    public boolean hasTag(String tag) {
-        for(String string : tags) {
-            if(tag.equals(string)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public ResourceSlotWidget<T> addTag(String tag) {
-        this.tags.add(tag.toLowerCase());
         return this;
     }
 
