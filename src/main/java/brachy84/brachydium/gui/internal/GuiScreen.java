@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.LiteralText;
@@ -25,12 +26,22 @@ public class GuiScreen extends Screen implements GuiHelper {
     protected GuiScreen(Gui gui) {
         super(new LiteralText(""));
         this.gui = gui;
+        this.gui.setScreen(this);
+        this.gui.init();
     }
 
     @Override
     public void onClose() {
         super.onClose();
         gui.close();
+    }
+
+    @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        renderBackground(matrices);
+        Pos2d pos = new Pos2d(mouseX, mouseY);
+        gui.render(matrices, pos, delta);
+        gui.renderForeground(matrices, pos, delta);
     }
 
     @Nullable
@@ -195,13 +206,4 @@ public class GuiScreen extends Screen implements GuiHelper {
     public void setZ(float z) {
     }
 
-    @Override
-    public MatrixStack getMatrices() {
-        return null;
-    }
-
-    @Override
-    public void setMatrices(MatrixStack matrices) {
-
-    }
 }

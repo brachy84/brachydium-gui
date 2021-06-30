@@ -1,12 +1,18 @@
-package brachy84.brachydium.gui.api;
+package brachy84.brachydium.gui.api.widgets;
 
+import brachy84.brachydium.gui.api.Interactable;
+import brachy84.brachydium.gui.api.TextureArea;
 import brachy84.brachydium.gui.api.math.AABB;
-import brachy84.brachydium.gui.internal.old.RenderWidget;
+import brachy84.brachydium.gui.api.math.Pos2d;
+import brachy84.brachydium.gui.api.math.Size;
+import brachy84.brachydium.gui.internal.RenderObject;
+import brachy84.brachydium.gui.internal.Widget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,37 +23,33 @@ import java.util.List;
  * (like ItemStack or FluidStack)
  * @param <T> Resource f.e. ItemStack
  */
-public abstract class ResourceSlotWidget<T> extends RenderWidget<ResourceSlotWidget<T>> implements Interactable {
+public abstract class ResourceSlotWidget<T> extends Widget implements Interactable {
 
     private final List<TextureArea> textures = new ArrayList<>();
-    //protected Shape shape;
-    private String tag = "";
-    public ResourceSlotWidget() {
-        //shape = Shape.rect(bounds.getSize());
+    private final List<String> tags = new ArrayList<>();
+
+    public ResourceSlotWidget(AABB bounds) {
+        super(bounds);
+    }
+
+    public ResourceSlotWidget(Size size, Pos2d pos) {
+        super(size, pos);
     }
 
     @Override
-    public void render(IGuiHelper guiHelper, AABB bounds, float delta) {
-        if(textures.size() > 0) {
-            textures.forEach(sprite -> guiHelper.drawTexture(sprite, getAbsolutePos(), getSize()));
-        } else {
-            guiHelper.drawTexture(getDefaultTexture(), getAbsolutePos());
-        }
-        renderResource(guiHelper.getMatrices());
-    }
-
-    @Override
-    public void renderForeground(IGuiHelper guiHelper, AABB bounds, float delta) {
-        renderResource(guiHelper.getMatrices());
+    public @Nullable RenderObject getRenderObject() {
+        return ((matrices, delta) -> {
+            if(textures.size() > 0) {
+                textures.forEach(sprite -> guiHelper.drawTexture(matrices, sprite, getPos(), getSize()));
+            } else {
+                guiHelper.drawTexture(matrices, getFallbackTexture(), getPos());
+            }
+            renderResource(matrices);
+        });
     }
 
     @Environment(EnvType.CLIENT)
     public abstract void renderResource(MatrixStack matrices);
-
-    @Override
-    public ResourceSlotWidget<T> getParent() {
-        return this;
-    }
 
     /**
      * Called when the player tries to insert something
@@ -77,35 +79,60 @@ public abstract class ResourceSlotWidget<T> extends RenderWidget<ResourceSlotWid
      */
     public boolean setResource(T resource, Action action) {
         if(action == Action.TAKE) {
-            if(!canTake(gui.player)) return false;
+            if(!canTake(getGui().player)) return false;
         } else if(action == Action.PUT) {
-            if(!canPut(resource, gui.player)) return false;
+            if(!canPut(resource, getGui().player)) return false;
         }
         return setResource(resource);
     }
 
+    /**
+     * This method should not be called. Use {@link ResourceSlotWidget#setResource(Object, Action)} instead
+     * @param resource to set
+     * @return if the resource was successfully set
+     */
     @ApiStatus.OverrideOnly
     public abstract boolean setResource(T resource);
 
     public abstract boolean isEmpty();
 
-    public abstract TextureArea getDefaultTexture();
+    /**
+     * @return the fallback background to render if it has no sprites
+     */
+    public abstract TextureArea getFallbackTexture();
 
+    /**
+     * @return the background sprites
+     */
     public List<TextureArea> getTextures() {
         return textures;
     }
 
-    public ResourceSlotWidget<T> setBackgroundSprites(TextureArea... sprite) {
+    /**
+     * @param sprite to render
+     * @return this, to use in a builder
+     */
+    public ResourceSlotWidget<T> addBackgroundSprites(TextureArea... sprite) {
         textures.addAll(Arrays.asList(sprite));
         return this;
     }
 
-    public String getTag() {
-        return tag;
+    /**
+     * Tags provide an easy way to find specific slots in a gui
+     * @param tag to check for
+     * @return if the slot has the tag
+     */
+    public boolean hasTag(String tag) {
+        for(String string : tags) {
+            if(tag.equals(string)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public ResourceSlotWidget<T> setTag(String tag) {
-        this.tag = tag.toLowerCase();
+    public ResourceSlotWidget<T> addTag(String tag) {
+        this.tags.add(tag.toLowerCase());
         return this;
     }
 

@@ -27,8 +27,8 @@ public final class RootWidget extends Widget implements MultiChildWidget {
         return new Gui(player, this);
     }
 
-    protected void init(int layer) {
-        init(DUMMY_PARENT, layer);
+    protected void init(Gui gui, int layer) {
+        init(gui, DUMMY_PARENT, layer);
     }
 
     @Override

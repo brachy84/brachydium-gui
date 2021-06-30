@@ -24,6 +24,28 @@ import java.util.List;
 
 public interface GuiHelper extends IGuiHelper {
 
+    static GuiHelper create(float layer, Pos2d pos) {
+        return new GuiHelper() {
+            private final Pos2d mousePos = pos;
+            private float z = layer;
+
+            @Override
+            public float getZ() {
+                return z;
+            }
+
+            @Override
+            public Pos2d getMousePos() {
+                return mousePos;
+            }
+
+            @Override
+            public void setZ(float z) {
+                this.z = z;
+            }
+        };
+    }
+
     @Override
     default TextRenderer getTextRenderer() {
         return MinecraftClient.getInstance().textRenderer;

@@ -1,5 +1,6 @@
 package brachy84.brachydium.gui.internal;
 
+import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.api.math.AABB;
 import brachy84.brachydium.gui.api.math.Alignment;
 import brachy84.brachydium.gui.api.math.Pos2d;
@@ -26,6 +27,7 @@ import java.util.function.Consumer;
  */
 public abstract class Widget {
 
+    private Gui gui;
     private Widget parent;
     private final List<Widget> children = new ArrayList<>();
     private int layer;
@@ -35,6 +37,7 @@ public abstract class Widget {
     private Alignment alignment;
     private boolean initialised;
     private boolean enabled;
+    protected IGuiHelper guiHelper;
 
     public Widget() {
         this(Size.ZERO, Pos2d.ZERO);
@@ -55,9 +58,10 @@ public abstract class Widget {
     }
 
     @ApiStatus.Internal
-    public final void init(Widget parent, int layer) {
+    public final void init(Gui gui, Widget parent, int layer) {
         if (this.parent != null)
             throw new IllegalStateException("Init should only be called once from Gui");
+        this.gui = gui;
         this.parent = Objects.requireNonNull(parent);
         this.layer = layer;
         if (!relativePos.isZero()) {
@@ -69,14 +73,14 @@ public abstract class Widget {
         onInit();
         this.initialised = true;
         for (Widget widget : children) {
-            widget.init(this, layer + 1);
+            widget.init(gui, this, layer + 10);
         }
     }
 
     @ApiStatus.Internal
-    public final void drawBackground(MatrixStack matrices, float delta) {
+    public final void drawForeground(MatrixStack matrices, float delta) {
         if(!isEnabled()) return;
-        RenderObject renderObject = getBackgroundRenderObject();
+        RenderObject renderObject = getForegroundRenderObject();
         if (renderObject != null) {
             matrices.push();
             matrices.translate(0, 0, layer);
@@ -84,13 +88,14 @@ public abstract class Widget {
             matrices.pop();
         }
         for (Widget widget : children) {
-            widget.drawBackground(matrices, delta);
+            widget.drawForeground(matrices, delta);
         }
     }
 
     @ApiStatus.Internal
-    public final void draw(MatrixStack matrices, float delta) {
+    public final void draw(MatrixStack matrices, Pos2d mousePos, float delta) {
         if(!isEnabled()) return;
+        this.guiHelper = GuiHelper.create(layer, mousePos);
         RenderObject renderObject = getRenderObject();
         if (renderObject != null) {
             matrices.push();
@@ -99,7 +104,7 @@ public abstract class Widget {
             matrices.pop();
         }
         for (Widget widget : children) {
-            widget.draw(matrices, delta);
+            widget.draw(matrices, mousePos, delta);
         }
     }
 
@@ -132,7 +137,7 @@ public abstract class Widget {
     }
 
     @Nullable
-    public RenderObject getBackgroundRenderObject() {
+    public RenderObject getForegroundRenderObject() {
         return null;
     }
 
@@ -184,6 +189,10 @@ public abstract class Widget {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Gui getGui() {
+        return gui;
     }
 
     protected Widget setPos(Pos2d pos) {

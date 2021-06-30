@@ -39,6 +39,7 @@ public class Gui {
 
     public final PlayerEntity player;
     private RootWidget root;
+    private GuiScreen screen;
     private ISyncedWidget[] syncedWidgets = {};
     private Interactable[] interactables = {};
 
@@ -49,7 +50,7 @@ public class Gui {
 
     @ApiStatus.Internal
     public void init() {
-        root.init(0);
+        root.init(this, 0);
 
         AtomicInteger syncId = new AtomicInteger();
         List<ISyncedWidget> syncedWidgets = new ArrayList<>();
@@ -67,11 +68,11 @@ public class Gui {
     }
 
     public void render(MatrixStack matrices, Pos2d mousePos, float delta) {
-        root.draw(matrices, delta);
+        root.draw(matrices, mousePos, delta);
     }
 
-    public void renderBackground(MatrixStack matrices, Pos2d mousePos, float delta) {
-        root.drawBackground(matrices, delta);
+    public void renderForeground(MatrixStack matrices, Pos2d mousePos, float delta) {
+        root.drawForeground(matrices, delta);
     }
 
     public void onScreenResize() {
@@ -117,5 +118,13 @@ public class Gui {
 
     public AABB getBounds() {
         return root.getBounds();
+    }
+
+    public GuiScreen getScreen() {
+        return screen;
+    }
+
+    public void setScreen(GuiScreen screen) {
+        this.screen = screen;
     }
 }
