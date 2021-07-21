@@ -43,7 +43,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// Fabric/Quilt Loom and Architectury's "forgeloom"
-	modImplementation("dev.latvian.mods:kubejs-fabric:${project.kubejs_version}")
+	//modImplementation("dev.latvian.mods:kubejs-fabric:${project.kubejs_version}")
 
 	modImplementation 'io.github.astrarre:astrarre-transfer-v0-fabric:1.5.15'
 

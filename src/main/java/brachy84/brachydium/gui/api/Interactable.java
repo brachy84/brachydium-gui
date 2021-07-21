@@ -10,7 +10,7 @@ import org.lwjgl.glfw.GLFW;
 
 /**
  * An interface that handles user interactions.
- * These methods get called on the Server
+ * These methods get called on the client
  */
 public interface Interactable extends ISyncedWidget {
 

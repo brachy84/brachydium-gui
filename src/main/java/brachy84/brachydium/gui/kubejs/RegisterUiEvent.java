@@ -1,5 +1,5 @@
 package brachy84.brachydium.gui.kubejs;
-
+/*
 import brachy84.brachydium.gui.internal.Gui;
 import dev.latvian.kubejs.server.ServerEventJS;
 import net.fabricmc.fabric.api.event.Event;
@@ -24,4 +24,4 @@ public class RegisterUiEvent extends ServerEventJS {
                     }
                 });
     }
-}
+}*/

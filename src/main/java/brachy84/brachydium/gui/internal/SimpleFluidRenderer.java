@@ -1,4 +1,4 @@
-// This file is copied from REI
+// This file is copied and modified from REI
 /*
  * This file is licensed under the MIT License, part of Roughly Enough Items.
  * Copyright (c) 2018, 2019, 2020 shedaniel

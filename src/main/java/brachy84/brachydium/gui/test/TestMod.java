@@ -1,0 +1,24 @@
+package brachy84.brachydium.gui.test;
+
+import brachy84.brachydium.gui.UiFactoryRegistry;
+import brachy84.brachydium.gui.internal.BlockEntityUiFactory;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+
+public class TestMod implements ModInitializer {
+
+    public static final TestBlock BLOCK = new TestBlock();
+
+    @Override
+    public void onInitialize() {
+
+        Registry.register(Registry.BLOCK, new Identifier("testmod", "testblock"), BLOCK);
+        Registry.register(Registry.ITEM, new Identifier("testmod", "testblock"), new BlockItem(BLOCK, new FabricItemSettings().group(ItemGroup.REDSTONE)));
+        TestBlockEntity.TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, "testmod:testblock", FabricBlockEntityTypeBuilder.create(TestBlockEntity::new, BLOCK).build(null));
+    }
+}

@@ -1,18 +1,15 @@
 package brachy84.brachydium.gui.api.widgets;
 
+import brachy84.brachydium.gui.api.IDrawable;
+import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.api.Interactable;
-import brachy84.brachydium.gui.api.TextureArea;
-import brachy84.brachydium.gui.api.math.AABB;
-import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
-import brachy84.brachydium.gui.internal.RenderObject;
-import brachy84.brachydium.gui.internal.Widget;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,30 +22,46 @@ import java.util.List;
  */
 public abstract class ResourceSlotWidget<T> extends Widget implements Interactable {
 
-    private final List<TextureArea> textures = new ArrayList<>();
+    private final List<IDrawable> textures = new ArrayList<>();
 
-    public ResourceSlotWidget(AABB bounds) {
-        super(bounds);
-    }
+    @Override
+    public void render(IGuiHelper helper, MatrixStack matrices, float delta) {
+        if(textures.size() > 0) {
+            textures.forEach(sprite -> helper.drawTexture(matrices, sprite, getPos(), getSize()));
+        } else {
+            helper.drawTexture(matrices, getFallbackTexture(), getPos());
+        }
 
-    public ResourceSlotWidget(Size size, Pos2d pos) {
-        super(size, pos);
+        if(!isEmpty())
+            renderResource(helper, matrices);
+        if(isInBounds(helper.getMousePos())) {
+            renderHoveringOverlay(helper, matrices, delta);
+        }
     }
 
     @Override
-    public @Nullable RenderObject getRenderObject() {
-        return ((matrices, delta) -> {
-            if(textures.size() > 0) {
-                textures.forEach(sprite -> guiHelper.drawTexture(matrices, sprite, getPos(), getSize()));
-            } else {
-                guiHelper.drawTexture(matrices, getFallbackTexture(), getPos());
-            }
-            renderResource(matrices);
-        });
+    public void renderForeground(IGuiHelper helper, MatrixStack matrices, float delta) {
+        if(getGui().getCursorSlot().isEmpty() && isInBounds(helper.getMousePos()) && !isEmpty())
+            renderTooltip(helper, matrices, delta);
     }
 
     @Environment(EnvType.CLIENT)
-    public abstract void renderResource(MatrixStack matrices);
+    @ApiStatus.OverrideOnly
+    public abstract void renderResource(IGuiHelper helper, MatrixStack matrices);
+
+    @Environment(EnvType.CLIENT)
+    @ApiStatus.OverrideOnly
+    public void renderHoveringOverlay(IGuiHelper helper, MatrixStack matrices, float delta) {
+        RenderSystem.disableDepthTest();
+        RenderSystem.colorMask(true, true, true, false);
+        helper.fillGradient(matrices, getPos().add(1, 1), new Size(16, 16), -2130706433, -2130706433);
+        RenderSystem.colorMask(true, true, true, true);
+        RenderSystem.enableDepthTest();
+    }
+
+    @Environment(EnvType.CLIENT)
+    @ApiStatus.OverrideOnly
+    public abstract void renderTooltip(IGuiHelper helper, MatrixStack matrices, float delta);
 
     /**
      * Called when the player tries to insert something
@@ -77,6 +90,7 @@ public abstract class ResourceSlotWidget<T> extends Widget implements Interactab
      * @return if the resource was successfully set
      */
     public boolean setResource(T resource, Action action) {
+        System.out.println("Try set resource " + resource + " with action " + action);
         if(action == Action.TAKE) {
             if(!canTake(getGui().player)) return false;
         } else if(action == Action.PUT) {
@@ -98,12 +112,12 @@ public abstract class ResourceSlotWidget<T> extends Widget implements Interactab
     /**
      * @return the fallback background to render if it has no sprites
      */
-    public abstract TextureArea getFallbackTexture();
+    public abstract IDrawable getFallbackTexture();
 
     /**
      * @return the background sprites
      */
-    public List<TextureArea> getTextures() {
+    public List<IDrawable> getTextures() {
         return textures;
     }
 
@@ -111,7 +125,7 @@ public abstract class ResourceSlotWidget<T> extends Widget implements Interactab
      * @param sprite to render
      * @return this, to use in a builder
      */
-    public ResourceSlotWidget<T> addBackgroundSprites(TextureArea... sprite) {
+    public ResourceSlotWidget<T> addBackgroundSprites(IDrawable... sprite) {
         textures.addAll(Arrays.asList(sprite));
         return this;
     }

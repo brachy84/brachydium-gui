@@ -1,16 +1,14 @@
 package brachy84.brachydium.gui.api.widgets;
 
 import brachy84.brachydium.gui.BrachydiumGui;
-import brachy84.brachydium.gui.api.Interactable;
-import brachy84.brachydium.gui.api.ItemTransferTag;
-import brachy84.brachydium.gui.api.TextureArea;
-import brachy84.brachydium.gui.api.WidgetTag;
+import brachy84.brachydium.gui.api.*;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
 import brachy84.brachydium.gui.internal.TransferStackHandler;
 import brachy84.brachydium.gui.internal.wrapper.AstrarreSlot;
 import io.github.astrarre.itemview.v0.fabric.ItemKey;
 import io.github.astrarre.transfer.v0.api.participants.array.Slot;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -25,20 +23,27 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
 
     public static final Size SIZE = new Size(18, 18);
 
-    private final Slot<ItemKey> astrarreSlot;
+    //private final Slot<ItemKey> astrarreSlot;
+    private final Inventory inv;
+    private final int index;
     private ItemTransferTag tag;
 
-    public ItemSlotWidget(Slot<ItemKey> slot, Pos2d pos) {
-        super(SIZE, pos);
+    /*public ItemSlotWidget(Slot<ItemKey> slot, Pos2d pos) {
+        setSize(SIZE);
+        setPos(pos);
         this.astrarreSlot = slot;
     }
 
     public ItemSlotWidget(net.minecraft.screen.slot.Slot slot, Pos2d pos) {
         this(new AstrarreSlot(slot), pos);
-    }
+    }*/
 
     public ItemSlotWidget(Inventory inv, int index, Pos2d pos) {
-        this(AstrarreSlot.of(inv, index), pos);
+        //this(AstrarreSlot.of(inv, index), pos);
+        setSize(SIZE);
+        setPos(pos);
+        this.inv = inv;
+        this.index = index;
     }
 
     @Override
@@ -57,18 +62,27 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
     }
 
     @Override
-    public void renderResource(MatrixStack matrices) {
-        guiHelper.drawItem(matrices, getResource(), getPos().add(1, 1));
+    public void renderResource(IGuiHelper helper, MatrixStack matrices) {
+        helper.drawItem(matrices, getResource(), getPos().add(1, 1));
+    }
+
+    @Override
+    public void renderTooltip(IGuiHelper helper, MatrixStack matrices, float delta) {
+        getGui().getScreen().renderTooltip(matrices, getGui().getScreen().getTooltipFromItem(getResource()), getResource().getTooltipData(), (int) helper.getMousePos().x, (int) helper.getMousePos().y);
     }
 
     @Override
     public ItemStack getResource() {
-        return astrarreSlot.getKey(null).createItemStack(astrarreSlot.getQuantity(null));
+        //return astrarreSlot.getKey(null).createItemStack(astrarreSlot.getQuantity(null));
+        return inv.getStack(index);
     }
 
     @Override
     public boolean setResource(ItemStack resource) {
-        return astrarreSlot.set(null, ItemKey.of(resource), resource.getCount());
+        System.out.println("Setting stack to " + resource);
+        //return astrarreSlot.set(null, ItemKey.of(resource), resource.getCount());
+        inv.setStack(index, resource);
+        return true;
     }
 
     public void setCursorStack(ItemStack stack) {
@@ -86,7 +100,7 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
 
     @Override
     public TextureArea getFallbackTexture() {
-        return TextureArea.fullImage(new Identifier("brachydium", "textures/gui/slot"), SIZE);
+        return TextureArea.fullImage(new Identifier("brachydium", "gui/base/slot"), SIZE);
     }
 
     private ItemStack newStack(ItemStack stack, int amount) {
@@ -104,24 +118,28 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         return this;
     }
 
-    public Slot<ItemKey> getAstrarreSlot() {
+    /*public Slot<ItemKey> getAstrarreSlot() {
         return astrarreSlot;
-    }
+    }*/
 
     @Override
     public void onClick(Pos2d pos, int buttonId, boolean isDoubleClick) {
+        if(getGui().player instanceof ClientPlayerEntity)
+            System.out.println("Click slot client");
+        else
+            System.out.println("Click slot server");
+
         ItemStack cursorStack = getCursorStack();
         ItemStack slotStack = getResource();
+        System.out.println("CursorStack " + cursorStack + " | SlotStack " + slotStack);
         // Left click
         if (buttonId == 0) {
             if (Interactable.hasShiftDown()) {
                 transferStack();
             } else if (cursorStack.isEmpty()) {
                 if (slotStack.isEmpty()) return;
-                if (setResource(ItemStack.EMPTY, Action.TAKE)) {
-                    BrachydiumGui.LOGGER.info("Slot set to empty");
+                if (setResource(ItemStack.EMPTY, Action.TAKE))
                     setCursorStack(slotStack.copy());
-                }
             } else if (cursorStack.getItem() == slotStack.getItem()) {
                 int cursorAmount = cursorStack.getCount();
                 int slotAmount = slotStack.getCount();
@@ -158,10 +176,11 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
                 setCursorStack(new ItemStack(slotStack.getItem(), slotStack.getMaxCount()));
             }
         }
+        System.out.println("CursorStack " + getCursorStack() + " | SlotStack " + getResource());
         // lastly simply sync the slot and the cursor slot to the client
-        if (getGui().player instanceof ServerPlayerEntity) {
-            sendToClient((ServerPlayerEntity) getGui().player);
-            getGui().getCursorSlot().sendToClient((ServerPlayerEntity) getGui().player);
+        if (getGui().player instanceof ClientPlayerEntity) {
+            sendToServer();
+            getGui().getCursorSlot().sendToServer();
         }
     }
 
@@ -176,7 +195,7 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         for(WidgetTag tag : order) {
             for(ItemSlotWidget slot : itemSlots.stream().filter(widget -> widget.tag == tag).collect(Collectors.toList())) {
                 if(slot == this) continue;
-                toInsert -= slot.astrarreSlot.insert(null, ItemKey.of(stack), toInsert);
+                //toInsert -= slot.astrarreSlot.insert(null, ItemKey.of(stack), toInsert);
                 if(toInsert == 0)
                     break outer;
             }

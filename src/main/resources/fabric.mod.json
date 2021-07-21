@@ -19,10 +19,13 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "brachy84.brachydium.gui.BrachydiumGui"
+      "brachy84.brachydium.gui.BrachydiumGui",
+      "brachy84.brachydium.gui.test.TestMod"
+    ],
+    "client": [
+      "brachy84.brachydium.gui.internal.ClientUi"
     ],
     "kubejs-init": [
-      "brachy84.brachydium.gui.kubejs.KubeJsInit"
     ]
   },
   "mixins": [
@@ -30,9 +33,9 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.11.3",
+    "fabricloader": ">=0.11.6",
     "fabric": "*",
-    "minecraft": "1.17.x",
+    "minecraft": "1.17.1",
     "java": ">=16"
   },
   "suggests": {

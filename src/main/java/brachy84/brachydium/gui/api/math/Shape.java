@@ -36,8 +36,8 @@ public class Shape {
     public static Shape rect(Size size) {
         return builder().beginnMode(GL11.GL_QUADS)
                 .vertex(Pos2d.ZERO)
-                .vertexX(size.width)
-                .vertexY(size.height)
+                .vertexX(size.width())
+                .vertexY(size.height())
                 .vertexX(0)
                 .vertexY(0)
                 .build();

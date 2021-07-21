@@ -4,26 +4,27 @@ import brachy84.brachydium.gui.Networking;
 import brachy84.brachydium.gui.api.ISyncedWidget;
 import brachy84.brachydium.gui.api.Interactable;
 import brachy84.brachydium.gui.api.math.Pos2d;
+import brachy84.brachydium.gui.api.widgets.Widget;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class GuiScreen extends Screen implements GuiHelper {
 
     private final Gui gui;
     private final Interactable[] interactables;
     private Interactable focused;
+    private long lastClick = 0;
+    private Interactable lastFocusedClick;
 
     protected GuiScreen(Gui gui) {
         super(new LiteralText(""));
@@ -37,6 +38,12 @@ public class GuiScreen extends Screen implements GuiHelper {
     public void onClose() {
         super.onClose();
         gui.close();
+        ClientPlayNetworking.send(Networking.UI_CLOSE, PacketByteBufs.create());
+    }
+
+    @Override
+    protected void init() {
+        gui.onScreenResize();
     }
 
     @Override
@@ -44,13 +51,12 @@ public class GuiScreen extends Screen implements GuiHelper {
         renderBackground(matrices);
         Pos2d pos = new Pos2d(mouseX, mouseY);
         gui.render(matrices, pos, delta);
-        gui.renderForeground(matrices, pos, delta);
     }
 
     public <T extends Widget & Interactable> List<T> getMatchingInteractables(Predicate<T> predicate) {
         List<T> interactables = new ArrayList<>();
-        for(Interactable interactable : this.interactables) {
-            if(predicate.test((T) interactable)) {
+        for (Interactable interactable : this.interactables) {
+            if (predicate.test((T) interactable)) {
                 interactables.add((T) interactable);
             }
         }
@@ -60,13 +66,13 @@ public class GuiScreen extends Screen implements GuiHelper {
     @Nullable
     public Interactable getHoveredInteractable(Pos2d pos) {
         Interactable topWidget = null;
-        for (Interactable interactable : getMatchingInteractables(widget -> widget.isMouseOver(pos) && widget.isEnabled())) {
-            if (interactable instanceof Widget widget) {
+        for (Interactable interactable : getMatchingInteractables(widget -> ((Widget) widget).isInBounds(pos) && ((Widget) widget).isEnabled())) {
+            if (interactable instanceof Widget widgetOld) {
                 if (topWidget == null) {
                     topWidget = interactable;
                     continue;
                 }
-                if (widget.getLayer() > ((Widget)topWidget).getLayer()) {
+                if (widgetOld.getLayer() > ((Widget) topWidget).getLayer()) {
                     topWidget = interactable;
                 }
             }
@@ -100,13 +106,18 @@ public class GuiScreen extends Screen implements GuiHelper {
         Pos2d pos = new Pos2d(mouseX, mouseY);
         Interactable focused = getHoveredInteractable(pos);
         if (focused != null) {
-            PacketByteBuf buf = PacketByteBufs.create();
+            long time = Util.getMeasuringTimeMs();
+            boolean doubleClick = focused == lastFocusedClick && time - lastClick < 500;
+
+            focused.onClick(pos, button, doubleClick);
+
+            /*PacketByteBuf buf = PacketByteBufs.create();
             buf.writeInt(getFocusedId());
             buf.writeDouble(mouseX);
             buf.writeDouble(mouseY);
             buf.writeInt(button);
 
-            ClientPlayNetworking.send(Networking.MOUSE_CLICKED, buf);
+            ClientPlayNetworking.send(Networking.MOUSE_CLICKED, buf);*/
             setFocused(focused);
             setDragging(true);
         }
@@ -118,13 +129,15 @@ public class GuiScreen extends Screen implements GuiHelper {
         Pos2d pos = new Pos2d(mouseX, mouseY);
         Interactable focused = getHoveredInteractable(pos);
         if (focused != null) {
-            PacketByteBuf buf = PacketByteBufs.create();
+
+            focused.onClickReleased(pos, button);
+            /*PacketByteBuf buf = PacketByteBufs.create();
             buf.writeInt(getFocusedId());
             buf.writeDouble(mouseX);
             buf.writeDouble(mouseY);
             buf.writeInt(button);
 
-            ClientPlayNetworking.send(Networking.MOUSE_RELEASED, buf);
+            ClientPlayNetworking.send(Networking.MOUSE_RELEASED, buf);*/
 
             setDragging(false);
         }
@@ -134,7 +147,9 @@ public class GuiScreen extends Screen implements GuiHelper {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (this.getFocusedWidget() != null && this.isDragging()) {
-            PacketByteBuf buf = PacketByteBufs.create();
+
+            getFocusedWidget().onMouseDragged(new Pos2d(mouseX, mouseY), button, deltaX, deltaY);
+            /*PacketByteBuf buf = PacketByteBufs.create();
             buf.writeInt(getFocusedId());
             buf.writeDouble(mouseX);
             buf.writeDouble(mouseY);
@@ -142,7 +157,7 @@ public class GuiScreen extends Screen implements GuiHelper {
             buf.writeDouble(deltaX);
             buf.writeDouble(deltaY);
 
-            ClientPlayNetworking.send(Networking.MOUSE_DRAGGED, buf);
+            ClientPlayNetworking.send(Networking.MOUSE_DRAGGED, buf);*/
         }
         return false;
     }
@@ -152,32 +167,40 @@ public class GuiScreen extends Screen implements GuiHelper {
         Pos2d pos = new Pos2d(mouseX, mouseY);
         Interactable focused = getHoveredInteractable(pos);
         if (focused != null) {
-            PacketByteBuf buf = PacketByteBufs.create();
+
+            focused.onScrolled(pos, amount);
+            /*PacketByteBuf buf = PacketByteBufs.create();
             buf.writeInt(getFocusedId());
             buf.writeDouble(mouseX);
             buf.writeDouble(mouseY);
             buf.writeDouble(amount);
 
-            ClientPlayNetworking.send(Networking.MOUSE_SCROLLED, buf);
+            ClientPlayNetworking.send(Networking.MOUSE_SCROLLED, buf);*/
         }
         return false;
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        // TODO implement
+        if (getFocusedWidget() != null) {
+            getFocusedWidget().onKeyPressed(keyCode, scanCode, modifiers);
+        }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        // TODO implement
+        if (getFocusedWidget() != null) {
+            getFocusedWidget().onKeyReleased(keyCode, scanCode, modifiers);
+        }
         return super.keyReleased(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean charTyped(char chr, int modifiers) {
-        // TODO implement
+        if (getFocusedWidget() != null) {
+            getFocusedWidget().onCharTyped(chr, modifiers);
+        }
         return super.charTyped(chr, modifiers);
     }
 

@@ -25,7 +25,6 @@ public record Alignment(float x, float y) {
 
     public Pos2d getAlignedPos(Size parent, Size child) {
         float x = (this.x + 1) / 2, y = (this.y + 1) / 2;
-        float w = (parent.width - child.width) / 2, h = (parent.height - child.height) / 2;
-        return new Pos2d(h + h * x, w + w * y);
+        return new Pos2d(parent.width() * x - child.width() * x, parent.height() * y - child.height() * y);
     }
 }

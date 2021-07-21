@@ -22,6 +22,14 @@ public interface IGuiHelper {
 
     void setZ(float z);
 
+    default void incrementZ(float amount) {
+        setZ(getZ() + amount);
+    }
+
+    default void decrementZ(float amount) {
+        setZ(getZ() - amount);
+    }
+
     TextRenderer getTextRenderer();
 
     void drawText(MatrixStack matrices, Text text, Pos2d pos);
@@ -32,11 +40,15 @@ public interface IGuiHelper {
 
     void drawFluid(MatrixStack matrices, Fluid fluid, String amount, Pos2d pos, Size size);
 
-    void drawTexture(MatrixStack matrices, TextureArea texture, Pos2d pos);
+    void drawTexture(MatrixStack matrices, IDrawable texture, Pos2d pos);
 
-    void drawTexture(MatrixStack matrices, TextureArea texture, Pos2d pos, Size size);
+    void drawTexture(MatrixStack matrices, IDrawable texture, Pos2d pos, Size size);
 
     void drawTooltip(MatrixStack matrices, List<? extends OrderedText> lines, Pos2d pos);
+
+    void fill(MatrixStack matrices, Pos2d pos, Size size, int color);
+
+    void fillGradient(MatrixStack matrices, Pos2d pos, Size size, int colorStart, int colorEnd);
 
     /*void drawHorizontalLine(Point start, float length, Color color);
 

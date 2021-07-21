@@ -31,8 +31,8 @@ public abstract class UIFactory<T extends UIHolder> {
         this.id = id;
     }
 
-    public final void openUI(T uiHolder, ServerPlayerEntity player) {
-        if(!uiHolder.hasUI()) return;
+    public final boolean openUI(T uiHolder, ServerPlayerEntity player) {
+        if(!uiHolder.hasUI()) return false;
         BrachydiumGui.LOGGER.info("Building UI");
 
         UiHandler.openGui(player, uiHolder.createUi(player));
@@ -40,14 +40,16 @@ public abstract class UIFactory<T extends UIHolder> {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeIdentifier(getId());
         writeHolderToSyncData(buf, uiHolder);
+
         ServerPlayNetworking.send(player, UI_SYNC_ID, buf);
+        return true;
     }
 
     @ApiStatus.Internal
     @Environment(EnvType.CLIENT)
     public final void openClientUi(UIHolder uiHolder) {
         Gui gui = uiHolder.createUi(MinecraftClient.getInstance().player);
-        MinecraftClient.getInstance().openScreen(new GuiScreen(gui));
+        MinecraftClient.getInstance().setScreen(new GuiScreen(gui));
     }
 
     public Identifier getId() {
@@ -66,7 +68,9 @@ public abstract class UIFactory<T extends UIHolder> {
             UIFactory<?> factory = UiFactoryRegistry.tryGet(factoryId);
             if (factory != null) {
                 UIHolder holder = factory.readHolderFromSyncData(buf);
-                factory.openClientUi(holder);
+                MinecraftClient.getInstance().execute(() -> {
+                    factory.openClientUi(holder);
+                });
             }
         }
     }

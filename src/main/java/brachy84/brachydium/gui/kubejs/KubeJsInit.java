@@ -1,5 +1,5 @@
 package brachy84.brachydium.gui.kubejs;
-
+/*
 import dev.latvian.kubejs.KubeJSInitializer;
 import dev.latvian.kubejs.script.ScriptType;
 
@@ -11,4 +11,4 @@ public class KubeJsInit implements KubeJSInitializer {
             event.post(ScriptType.SERVER, "brachydium.gui");
         });
     }
-}
+}*/

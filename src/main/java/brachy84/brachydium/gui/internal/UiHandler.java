@@ -15,6 +15,7 @@ public class UiHandler {
 
     public static void openGui(ServerPlayerEntity player, Gui gui) {
         SCREEN_MAP.put(player, gui);
+        gui.init();
     }
 
     public static void remove(ServerPlayerEntity player) {
@@ -29,8 +30,8 @@ public class UiHandler {
     @Nullable
     public static Gui getCurrentGui(ClientPlayerEntity player) {
         Screen screen = MinecraftClient.getInstance().currentScreen;
-        if(screen instanceof GuiScreen guiScreen)
-            return guiScreen.getGui();
+        if(screen instanceof GuiScreen)
+            return ((GuiScreen) screen).getGui();
         return null;
     }
 }

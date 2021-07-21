@@ -4,10 +4,19 @@ import java.util.Objects;
 
 public record Size(float width, float height) {
 
+    public Size {
+        if(width < 0) throw new IllegalArgumentException("Width in size can't be smaller than 0");
+        if(height < 0) throw new IllegalArgumentException("Height in size can't be smaller than 0");
+    }
+
     public static final Size ZERO = new Size(0, 0);
 
     public boolean isLargerThan(Size size) {
-        return ((width - size.width) + (height - size.height)) > 0;
+        return (size.width * size.height) < (width * height);
+    }
+
+    public boolean hasLargerDimensionsThan(Size size) {
+        return width > size.width && height > size.height;
     }
 
     /**
@@ -16,6 +25,10 @@ public record Size(float width, float height) {
      */
     public Pos2d getCenteringPointForChild(Size size) {
         return new Pos2d((width - size.width) / 2, (height - size.height) / 2);
+    }
+
+    public boolean isZero() {
+        return width == 0 && height == 0;
     }
 
     @Override
