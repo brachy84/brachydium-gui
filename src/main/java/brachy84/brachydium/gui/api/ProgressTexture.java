@@ -2,7 +2,7 @@ package brachy84.brachydium.gui.api;
 
 public class ProgressTexture {
 
-    private TextureArea empty, full;
+    private final TextureArea empty, full;
 
     public ProgressTexture(TextureArea empty, TextureArea full) {
         this.empty = empty;
