@@ -45,8 +45,6 @@ dependencies {
 	// Fabric/Quilt Loom and Architectury's "forgeloom"
 	//modImplementation("dev.latvian.mods:kubejs-fabric:${project.kubejs_version}")
 
-	modImplementation 'io.github.astrarre:astrarre-transfer-v0-fabric:1.5.15'
-
 	// these two are unfortunately needed since fg.deobf doesn't respect transitive dependencies as of yet
 	//implementation "dev.latvian.mods:rhino:${rhino_version}"
 	//implementation fg.deobf("me.shedaniel:architectury-forge:${architectury_version}")

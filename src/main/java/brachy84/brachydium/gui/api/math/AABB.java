@@ -4,6 +4,7 @@ import java.util.Objects;
 
 /**
  * Describes an area in a gui
+ * Axis Aligned Bounding Box
  */
 public final class AABB {
 
