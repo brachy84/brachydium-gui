@@ -2,9 +2,9 @@ package brachy84.brachydium.gui.api;
 
 public class ProgressTexture {
 
-    private final TextureArea empty, full;
+    private final IDrawable empty, full;
 
-    public ProgressTexture(TextureArea empty, TextureArea full) {
+    public ProgressTexture(IDrawable empty, IDrawable full) {
         this.empty = empty;
         this.full = full;
     }
@@ -17,11 +17,11 @@ public class ProgressTexture {
         return new ProgressTexture(area.getSubArea(0, 0, 1, 0.5f), area.getSubArea(0, 0.5f, 1, 1));
     }
 
-    public TextureArea getEmpty() {
+    public IDrawable getEmpty() {
         return empty;
     }
 
-    public TextureArea getFull() {
+    public IDrawable getFull() {
         return full;
     }
 }
