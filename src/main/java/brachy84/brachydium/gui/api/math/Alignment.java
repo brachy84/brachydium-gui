@@ -41,11 +41,11 @@ public record Alignment(float x, float y) {
         if(x < edgeInset.left())
             x = edgeInset.left();
         else if(parent.width() - (x + child.width()) < edgeInset.right())
-            x = parent.width() - edgeInset.right();
+            x = parent.width() - child.width() - edgeInset.right();
         if(y < edgeInset.top())
             y = edgeInset.top();
         else if(parent.height() - (y + child.height()) < edgeInset.bottom())
-            y = parent.height() - edgeInset.bottom();
+            y = parent.height() - child.height() - edgeInset.bottom();
         return new Pos2d(x, y);
     }
 }
