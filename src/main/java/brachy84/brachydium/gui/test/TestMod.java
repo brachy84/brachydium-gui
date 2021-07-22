@@ -16,9 +16,9 @@ public class TestMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
-        Registry.register(Registry.BLOCK, new Identifier("testmod", "testblock"), BLOCK);
-        Registry.register(Registry.ITEM, new Identifier("testmod", "testblock"), new BlockItem(BLOCK, new FabricItemSettings().group(ItemGroup.REDSTONE)));
-        TestBlockEntity.TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, "testmod:testblock", FabricBlockEntityTypeBuilder.create(TestBlockEntity::new, BLOCK).build(null));
+        Identifier TEST_BLOCK_ID = new Identifier("testmod", "testblock");
+        Registry.register(Registry.BLOCK, TEST_BLOCK_ID, BLOCK);
+        Registry.register(Registry.ITEM, TEST_BLOCK_ID, new BlockItem(BLOCK, new FabricItemSettings().group(ItemGroup.REDSTONE)));
+        TestBlockEntity.TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, TEST_BLOCK_ID, FabricBlockEntityTypeBuilder.create(TestBlockEntity::new, BLOCK).build(null));
     }
 }

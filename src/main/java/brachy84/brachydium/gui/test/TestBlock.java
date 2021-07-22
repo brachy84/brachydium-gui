@@ -1,8 +1,6 @@
 package brachy84.brachydium.gui.test;
 
-import brachy84.brachydium.gui.api.UIHolder;
 import brachy84.brachydium.gui.internal.BlockEntityUiFactory;
-import brachy84.brachydium.gui.internal.BlockEntityWithGui;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -27,22 +25,18 @@ public class TestBlock extends Block implements BlockEntityProvider {
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        System.out.println("Creating be");
         return new TestBlockEntity(pos, state);
     }
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if(!world.isClient()) {
-            System.out.println("OnUse");
+        if (!world.isClient()) {
             BlockEntity be = world.getBlockEntity(pos);
-            if(be instanceof TestBlockEntity) {
-                boolean opened = BlockEntityUiFactory.INSTANCE.openUI((TestBlockEntity)be, (ServerPlayerEntity) player);
-                if(opened)
+            if (be instanceof TestBlockEntity) {
+                if (BlockEntityUiFactory.INSTANCE.openUI((TestBlockEntity) be, (ServerPlayerEntity) player))
                     return ActionResult.SUCCESS;
             }
         }
-
         return super.onUse(state, world, pos, player, hand, hit);
     }
 }
