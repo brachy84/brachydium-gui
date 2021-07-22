@@ -1,14 +1,8 @@
 package brachy84.brachydium.gui.internal;
 
-import brachy84.brachydium.gui.api.IDrawable;
-import brachy84.brachydium.gui.api.ISyncedWidget;
-import brachy84.brachydium.gui.api.Interactable;
-import brachy84.brachydium.gui.api.math.AABB;
-import brachy84.brachydium.gui.api.math.Alignment;
-import brachy84.brachydium.gui.api.math.Pos2d;
-import brachy84.brachydium.gui.api.math.Size;
+import brachy84.brachydium.gui.api.*;
+import brachy84.brachydium.gui.api.math.*;
 import brachy84.brachydium.gui.api.widgets.*;
-import brachy84.brachydium.gui.api.widgets.Layout.CrossAxisAlignment;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
@@ -22,6 +16,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -62,12 +58,12 @@ public final class Gui {
         cursorSlot = new CursorSlotWidget();
     }
 
-    public static Builder builder(PlayerEntity player, IDrawable background) {
-        return new Builder(player, new SpriteWidget(background));
-    }
-
     public static Builder builder(PlayerEntity player, Size size) {
         return new Builder(player, size);
+    }
+
+    public static Builder defaultBuilder(PlayerEntity player) {
+        return new Builder(player, new Size(176, 166)).setBackground(TextureArea.fullImage("brachydium", "gui/base/background"));
     }
 
     @ApiStatus.Internal
@@ -90,7 +86,7 @@ public final class Gui {
         SYNCED_ID_MAP.defaultReturnValue(Integer.MIN_VALUE);
     }
 
-    public void recalculateLayout() {
+    public void reBuild() {
         root.forAllChildren(Widget::rePosition);
     }
 
@@ -197,20 +193,20 @@ public final class Gui {
         private SpriteWidget background;
         private final Size size;
         private Alignment alignment;
+        private EdgeInset margin;
         private Pos2d pos;
         private final List<Widget> children = new ArrayList<>();
-
-        private Builder(PlayerEntity player, SpriteWidget background) {
-            this.player = player;
-            this.background = background;
-            this.size = background.getSize();
-            this.alignment = Alignment.Center;
-        }
 
         private Builder(PlayerEntity player, Size size) {
             this.player = player;
             this.size = size;
             this.alignment = Alignment.Center;
+            this.margin = EdgeInset.ZERO;
+        }
+
+        public Builder setBackground(IDrawable drawable) {
+            this.background = new SpriteWidget(drawable, size);
+            return this;
         }
 
         public Builder setAlignment(Alignment alignment) {
@@ -225,34 +221,40 @@ public final class Gui {
             return this;
         }
 
-        public Builder child(Widget widget) {
+        public Builder widget(Widget widget) {
             children.add(widget);
             return this;
         }
 
-        public Builder children(Widget... widgets) {
+        public Builder widgets(Widget... widgets) {
             Collections.addAll(children, widgets);
             return this;
         }
 
-        public Builder bindPlayerInventory(float padding, Alignment alignment) {
-            float x = 0, y = 0;
-            if(alignment.x() == -1) x += padding;
-            else if(alignment.x() == 1) x -= padding;
-            if(alignment.y() == -1) y += padding;
-            else if(alignment.y() == 1) y -= padding;
-            return bindPlayerInventory(alignment.getAlignedPos(size, new Size(9 * 18, 4 * 18 + 5)).add(x, y));
+        /**
+         * Binds the player inventory WITH hotbar to the ui
+         *
+         * @param margin    margin
+         * @param alignment alignment
+         * @return Builder
+         */
+        public Builder bindPlayerInventory(@Nullable EdgeInset margin, @NotNull Alignment alignment) {
+            if (margin == null || margin.isZero())
+                return bindPlayerInventory(alignment.getAlignedPos(size, new Size(9 * 18, 4 * 18 + 5)));
+            return bindPlayerInventory(alignment.getAlignedPos(size, new Size(9 * 18, 4 * 18 + 5), margin));
         }
 
-        public Builder bindPlayerInventory(float y, CrossAxisAlignment horizontalAlignment) {
-            float x = size.width() * ((horizontalAlignment.value + 1) / 2) - 9 * 9;
-            return bindPlayerInventory(new Pos2d(x, y));
-        }
-
+        /**
+         * Binds the player inventory WITH hotbar to the ui
+         *
+         * @param pos pos
+         * @return Builder
+         */
         public Builder bindPlayerInventory(Pos2d pos) {
-            for(int i = 0; i < 3; ++i) {
-                for(int j = 0; j < 9; ++j) {
-                    child(new ItemSlotWidget(player.getInventory(), j + i * 9 + 9, pos));
+            for (int i = 0; i < 3; ++i) {
+                for (int j = 0; j < 9; ++j) {
+                    widget(new ItemSlotWidget(player.getInventory(), j + i * 9 + 9, pos)
+                        .addTag(ItemTransferTag.PLAYER_INV));
                     pos = pos.add(18, 0);
                 }
                 pos = pos.add(-18 * 9, 18);
@@ -260,14 +262,29 @@ public final class Gui {
             return bindHotbar(pos.add(0, 5));
         }
 
-        public Builder bindHotbar(float y, CrossAxisAlignment horizontalAlignment) {
-            float x = size.width() * ((horizontalAlignment.value + 1) / 2);
-            return bindHotbar(new Pos2d(x, y));
+        /**
+         * Binds only the hotbar to the ui
+         *
+         * @param margin    margin
+         * @param alignment alignment
+         * @return Builder
+         */
+        public Builder bindHotbar(@Nullable EdgeInset margin, @NotNull Alignment alignment) {
+            if (margin == null || margin.isZero())
+                return bindPlayerInventory(alignment.getAlignedPos(size, new Size(9 * 18, 18)));
+            return bindPlayerInventory(alignment.getAlignedPos(size, new Size(9 * 18, 18), margin));
         }
 
+        /**
+         * Binds only the hotbar to the ui
+         *
+         * @param pos pos
+         * @return Builder
+         */
         public Builder bindHotbar(Pos2d pos) {
-            for(int i = 0; i < 9; i++) {
-                child(new ItemSlotWidget(player.getInventory(), i, pos));
+            for (int i = 0; i < 9; i++) {
+                widget(new ItemSlotWidget(player.getInventory(), i, pos)
+                    .addTag(ItemTransferTag.HOTBAR));
                 pos = pos.add(18, 0);
             }
             return this;
@@ -275,7 +292,8 @@ public final class Gui {
 
         public Gui build() {
             RootWidget root = alignment == null ? new RootWidget(size, pos) : new RootWidget(size, alignment);
-            if(background != null)
+            root.setMargin(margin);
+            if (background != null)
                 root.child(background);
             root.children(children.toArray(new Widget[0]));
             return new Gui(player, root);

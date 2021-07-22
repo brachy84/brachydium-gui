@@ -2,10 +2,7 @@ package brachy84.brachydium.gui.api.widgets;
 
 import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.api.WidgetTag;
-import brachy84.brachydium.gui.api.math.AABB;
-import brachy84.brachydium.gui.api.math.Alignment;
-import brachy84.brachydium.gui.api.math.Pos2d;
-import brachy84.brachydium.gui.api.math.Size;
+import brachy84.brachydium.gui.api.math.*;
 import brachy84.brachydium.gui.internal.Gui;
 import brachy84.brachydium.gui.internal.GuiHelper;
 import net.minecraft.client.util.math.MatrixStack;
@@ -34,6 +31,7 @@ public abstract class Widget {
     private Size size;
     @Nullable
     private Alignment alignment;
+    private EdgeInset edgeInset;
     private boolean initialised;
     private boolean enabled;
 
@@ -43,6 +41,7 @@ public abstract class Widget {
         this.size = Size.ZERO;
         this.layer = 0;
         this.alignment = null;
+        this.edgeInset = EdgeInset.ZERO;
         this.initialised = false;
         this.enabled = true;
     }
@@ -94,8 +93,12 @@ public abstract class Widget {
     @ApiStatus.Internal
     public void rePosition() {
         if (!initialised) return;
-        if (alignment != null)
-            this.relativePos = alignment.getAlignedPos(parent.size, size);
+        if (alignment != null) {
+            if (edgeInset.isZero())
+                this.relativePos = alignment.getAlignedPos(parent.size, size);
+            else
+                this.relativePos = alignment.getAlignedPos(parent.size, size, edgeInset);
+        }
         this.pos = parent.pos.add(relativePos);
         if (this instanceof MultiChildWidget widget && widget.doesHandleLayout())
             widget.layoutChildren();
@@ -191,6 +194,18 @@ public abstract class Widget {
     }
 
     /**
+     * Defines the distance to the widgets parent
+     * Is only applied when {@link #getAlignment()} is not null
+     *
+     * @param edgeInset edgeInset
+     * @return this
+     */
+    public Widget setMargin(EdgeInset edgeInset) {
+        this.edgeInset = edgeInset == null ? EdgeInset.ZERO : edgeInset;
+        return this;
+    }
+
+    /**
      * removes the alignment
      *
      * @return this
@@ -239,8 +254,13 @@ public abstract class Widget {
         return AABB.of(getSize(), getPos());
     }
 
+    @Nullable
     public Alignment getAlignment() {
         return alignment;
+    }
+
+    public EdgeInset getMargin() {
+        return edgeInset;
     }
 
     public int getLayer() {

@@ -24,7 +24,28 @@ public record Alignment(float x, float y) {
     };
 
     public Pos2d getAlignedPos(Size parent, Size child) {
+        if(parent.width() < child.width() || parent.height() < child.height())
+            throw new IllegalArgumentException("Parent size can't be smaller than child size");
         float x = (this.x + 1) / 2, y = (this.y + 1) / 2;
         return new Pos2d(parent.width() * x - child.width() * x, parent.height() * y - child.height() * y);
+    }
+
+    public Pos2d getAlignedPos(Size parent, Size child, EdgeInset edgeInset) {
+        Pos2d pos = getAlignedPos(parent, child);
+        float spaceH = parent.width() - child.width(), spaceV = parent.height() - child.height();
+        if(edgeInset.left() + edgeInset.right() > spaceH)
+            edgeInset = new EdgeInset(edgeInset.top(), edgeInset.bottom(), spaceH / 2, spaceH / 2);
+        if(edgeInset.top() + edgeInset.bottom() > spaceV)
+            edgeInset = new EdgeInset(spaceV / 2, spaceV / 2, edgeInset.left(), edgeInset.right());
+        float x = pos.x, y = pos.y;
+        if(x < edgeInset.left())
+            x = edgeInset.left();
+        else if(parent.width() - (x + child.width()) < edgeInset.right())
+            x = parent.width() - edgeInset.right();
+        if(y < edgeInset.top())
+            y = edgeInset.top();
+        else if(parent.height() - (y + child.height()) < edgeInset.bottom())
+            y = parent.height() - edgeInset.bottom();
+        return new Pos2d(x, y);
     }
 }
