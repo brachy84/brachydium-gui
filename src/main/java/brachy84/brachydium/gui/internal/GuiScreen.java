@@ -245,4 +245,8 @@ public class GuiScreen extends Screen implements GuiHelper {
     public void setZ(float z) {
     }
 
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
 }
