@@ -66,7 +66,7 @@ public class GuiScreen extends Screen implements GuiHelper {
     @Nullable
     public Interactable getHoveredInteractable(Pos2d pos) {
         Interactable topWidget = null;
-        for (Interactable interactable : getMatchingInteractables(widget -> ((Widget) widget).isInBounds(pos) && ((Widget) widget).isEnabled())) {
+        for (Interactable interactable : getMatchingInteractables(widget -> widget.isInBounds(pos) && widget.isEnabled())) {
             if (interactable instanceof Widget widgetOld) {
                 if (topWidget == null) {
                     topWidget = interactable;
@@ -110,14 +110,9 @@ public class GuiScreen extends Screen implements GuiHelper {
             boolean doubleClick = focused == lastFocusedClick && time - lastClick < 500;
 
             focused.onClick(pos, button, doubleClick);
+            gui.getCursor().onClick(pos, button, doubleClick);
 
-            /*PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeInt(getFocusedId());
-            buf.writeDouble(mouseX);
-            buf.writeDouble(mouseY);
-            buf.writeInt(button);
-
-            ClientPlayNetworking.send(Networking.MOUSE_CLICKED, buf);*/
+            lastFocusedClick = focused;
             setFocused(focused);
             setDragging(true);
         }
@@ -131,13 +126,7 @@ public class GuiScreen extends Screen implements GuiHelper {
         if (focused != null) {
 
             focused.onClickReleased(pos, button);
-            /*PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeInt(getFocusedId());
-            buf.writeDouble(mouseX);
-            buf.writeDouble(mouseY);
-            buf.writeInt(button);
-
-            ClientPlayNetworking.send(Networking.MOUSE_RELEASED, buf);*/
+            gui.getCursor().onClickReleased(pos, button);
 
             setDragging(false);
         }
@@ -147,17 +136,9 @@ public class GuiScreen extends Screen implements GuiHelper {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (this.getFocusedWidget() != null && this.isDragging()) {
-
-            getFocusedWidget().onMouseDragged(new Pos2d(mouseX, mouseY), button, deltaX, deltaY);
-            /*PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeInt(getFocusedId());
-            buf.writeDouble(mouseX);
-            buf.writeDouble(mouseY);
-            buf.writeInt(button);
-            buf.writeDouble(deltaX);
-            buf.writeDouble(deltaY);
-
-            ClientPlayNetworking.send(Networking.MOUSE_DRAGGED, buf);*/
+            Pos2d pos = new Pos2d(mouseX, mouseY);
+            getFocusedWidget().onMouseDragged(pos, button, deltaX, deltaY);
+            gui.getCursor().onMouseDragged(pos, button, deltaX, deltaY);
         }
         return false;
     }
@@ -167,15 +148,8 @@ public class GuiScreen extends Screen implements GuiHelper {
         Pos2d pos = new Pos2d(mouseX, mouseY);
         Interactable focused = getHoveredInteractable(pos);
         if (focused != null) {
-
             focused.onScrolled(pos, amount);
-            /*PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeInt(getFocusedId());
-            buf.writeDouble(mouseX);
-            buf.writeDouble(mouseY);
-            buf.writeDouble(amount);
-
-            ClientPlayNetworking.send(Networking.MOUSE_SCROLLED, buf);*/
+            gui.getCursor().onScrolled(pos, amount);
         }
         return false;
     }

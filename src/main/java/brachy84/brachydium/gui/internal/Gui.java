@@ -47,7 +47,7 @@ public final class Gui {
     public final PlayerEntity player;
     private final RootWidget root;
     private GuiScreen screen;
-    private final CursorSlotWidget cursorSlot;
+    private final CursorWidget cursorSlot;
     private Interactable[] interactables = {};
     private Int2ObjectMap<ISyncedWidget> SYNCED_WIDGET_MAP;
     private Object2IntMap<ISyncedWidget> SYNCED_ID_MAP;
@@ -55,7 +55,7 @@ public final class Gui {
     protected Gui(PlayerEntity player, RootWidget root) {
         this.root = root;
         this.player = player;
-        cursorSlot = new CursorSlotWidget();
+        cursorSlot = new CursorWidget();
     }
 
     public static Builder builder(PlayerEntity player, Size size) {
@@ -151,16 +151,16 @@ public final class Gui {
         return widgets;
     }
 
-    public CursorSlotWidget getCursorSlot() {
+    public CursorWidget getCursor() {
         return cursorSlot;
     }
 
     public ItemStack getCursorStack() {
-        return getCursorSlot().getResource();
+        return getCursor().getResource();
     }
 
     public void setCursorStack(ItemStack stack) {
-        getCursorSlot().setResource(stack);
+        getCursor().setResource(stack);
     }
 
     public Size getGuiSize() {

@@ -41,7 +41,7 @@ public abstract class ResourceSlotWidget<T> extends Widget implements Interactab
 
     @Override
     public void renderForeground(IGuiHelper helper, MatrixStack matrices, float delta) {
-        if(getGui().getCursorSlot().isEmpty() && isInBounds(helper.getMousePos()) && !isEmpty())
+        if(getGui().getCursor().isEmpty() && isInBounds(helper.getMousePos()) && !isEmpty())
             renderTooltip(helper, matrices, delta);
     }
 

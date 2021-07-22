@@ -3,6 +3,7 @@ package brachy84.brachydium.gui.api.widgets;
 import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.api.WidgetTag;
 import brachy84.brachydium.gui.api.math.*;
+import brachy84.brachydium.gui.internal.CursorWidget;
 import brachy84.brachydium.gui.internal.Gui;
 import brachy84.brachydium.gui.internal.GuiHelper;
 import net.minecraft.client.util.math.MatrixStack;
@@ -142,14 +143,14 @@ public abstract class Widget {
      * This is the only way to add widgets outside if this class
      *
      * @param widget to add
-     * @throws IllegalArgumentException if the widget is a {@link RootWidget} or a {@link CursorSlotWidget}
+     * @throws IllegalArgumentException if the widget is a {@link RootWidget} or a {@link CursorWidget}
      * @throws IllegalStateException    if this is a {@link SingleChildWidget} and it already has a child
      * @throws IllegalStateException    if the widget is already initialised
      */
     protected final void addChild(Widget widget) {
         if (initialised)
             throw new IllegalStateException("Can't add children after initialised");
-        if (widget instanceof CursorSlotWidget || widget instanceof RootWidget)
+        if (widget instanceof CursorWidget || widget instanceof RootWidget)
             throw new IllegalArgumentException("CursorSlot or RootWidgets can't be added");
         if (this instanceof SingleChildWidget && children.size() > 0)
             throw new IllegalStateException("SingleChildWidget can only hold a single widget");

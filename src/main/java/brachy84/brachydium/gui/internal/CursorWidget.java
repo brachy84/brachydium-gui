@@ -1,31 +1,34 @@
-package brachy84.brachydium.gui.api.widgets;
+package brachy84.brachydium.gui.internal;
 
-import brachy84.brachydium.gui.api.IDrawable;
-import brachy84.brachydium.gui.api.IGuiHelper;
-import brachy84.brachydium.gui.api.TextureArea;
+import brachy84.brachydium.gui.api.*;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.widgets.ItemSlotWidget;
 import brachy84.brachydium.gui.api.widgets.ResourceSlotWidget;
+import brachy84.brachydium.gui.api.widgets.Widget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import org.jetbrains.annotations.Nullable;
 
-public class CursorSlotWidget extends ResourceSlotWidget<ItemStack> {
+import java.util.Optional;
+
+public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
 
     private ItemStack stack;
+    @Nullable
+    private Draggable draggable;
 
-    public CursorSlotWidget() {
+    public CursorWidget() {
         setSize(ItemSlotWidget.SIZE);
         stack = ItemStack.EMPTY;
     }
 
     @Override
     public void render(IGuiHelper helper, MatrixStack matrices, float delta) {
-        //matrices.push();
-        //matrices.translate(-8, -8, 500);
-        renderResource(helper, matrices);
-        //matrices.pop();
+        if(!stack.isEmpty())
+            renderResource(helper, matrices);
+        if(draggable != null)
+            draggable.renderMovingState(helper, matrices, delta);
     }
 
     @Override
@@ -45,7 +48,6 @@ public class CursorSlotWidget extends ResourceSlotWidget<ItemStack> {
 
     @Override
     public void renderResource(IGuiHelper helper, MatrixStack matrices) {
-        //System.out.println("MousePos " + helper.getMousePos());
         helper.drawItem(matrices, getResource(), helper.getMousePos().add(-8, -8));
     }
 
@@ -72,11 +74,15 @@ public class CursorSlotWidget extends ResourceSlotWidget<ItemStack> {
 
     @Override
     public boolean isEmpty() {
-        return stack.isEmpty();
+        return stack.isEmpty() && draggable == null;
     }
 
     @Override
     public IDrawable getFallbackTexture() {
         return null;
+    }
+
+    private  <T extends Widget & Interactable> T getFocused() {
+        return (T) getGui().getScreen().getFocusedWidget();
     }
 }

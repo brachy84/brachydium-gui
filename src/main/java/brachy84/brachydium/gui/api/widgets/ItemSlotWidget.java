@@ -149,7 +149,7 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         // lastly simply sync the slot and the cursor slot to the client
         if (getGui().player instanceof ClientPlayerEntity) {
             sendToServer();
-            getGui().getCursorSlot().sendToServer();
+            getGui().getCursor().sendToServer();
         }
     }
 
