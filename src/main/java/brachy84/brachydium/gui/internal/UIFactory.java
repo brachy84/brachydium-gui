@@ -6,7 +6,9 @@ import brachy84.brachydium.gui.api.UIHolder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -16,10 +18,13 @@ public abstract class UIFactory<T extends UIHolder> {
 
     public static final Identifier UI_SYNC_ID = BrachydiumGui.id("modular_gui");
 
-    public final Identifier id;
+    protected UIFactory() {
+    }
 
-    protected UIFactory(Identifier id) {
-        this.id = id;
+    public boolean openUI(T uiHolder, PlayerEntity player) {
+        if(player instanceof ServerPlayerEntity)
+            return openUI(uiHolder, (ServerPlayerEntity) player);
+        return uiHolder.hasUI();
     }
 
     public final boolean openUI(T uiHolder, ServerPlayerEntity player) {
@@ -29,6 +34,7 @@ public abstract class UIFactory<T extends UIHolder> {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeIdentifier(getId());
         writeHolderToSyncData(buf, uiHolder);
+        ServerPlayNetworking.send(player, UI_SYNC_ID, buf);
         return true;
     }
 
@@ -39,9 +45,7 @@ public abstract class UIFactory<T extends UIHolder> {
         MinecraftClient.getInstance().setScreen(new GuiScreen(gui));
     }
 
-    public Identifier getId() {
-        return id;
-    }
+    public abstract Identifier getId();
 
     @Environment(EnvType.CLIENT)
     public abstract T readHolderFromSyncData(PacketByteBuf syncData);

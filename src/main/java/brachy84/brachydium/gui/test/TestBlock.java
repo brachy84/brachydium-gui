@@ -8,7 +8,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -30,12 +29,10 @@ public class TestBlock extends Block implements BlockEntityProvider {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (!world.isClient()) {
-            BlockEntity be = world.getBlockEntity(pos);
-            if (be instanceof TestBlockEntity) {
-                if (BlockEntityUiFactory.INSTANCE.openUI((TestBlockEntity) be, (ServerPlayerEntity) player))
-                    return ActionResult.SUCCESS;
-            }
+        BlockEntity be = world.getBlockEntity(pos);
+        if (be instanceof TestBlockEntity) {
+            if (BlockEntityUiFactory.INSTANCE.openUI((TestBlockEntity) be, player))
+                return ActionResult.SUCCESS;
         }
         return super.onUse(state, world, pos, player, hand, hit);
     }

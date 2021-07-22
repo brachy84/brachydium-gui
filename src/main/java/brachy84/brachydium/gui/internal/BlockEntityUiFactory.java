@@ -12,7 +12,11 @@ public class BlockEntityUiFactory extends UIFactory<BlockEntityWithGui> {
     public static final BlockEntityUiFactory INSTANCE = new BlockEntityUiFactory();
 
     private BlockEntityUiFactory() {
-        super(new Identifier("brachydium", "default_block_entity_ui_factory"));
+    }
+
+    @Override
+    public Identifier getId() {
+        return new Identifier("brachydium", "default_block_entity_ui_factory");
     }
 
     @Override
@@ -20,7 +24,7 @@ public class BlockEntityUiFactory extends UIFactory<BlockEntityWithGui> {
         BlockPos pos = syncData.readBlockPos();
         World world = MinecraftClient.getInstance().world;
         BlockEntity be = world.getBlockEntity(pos);
-        if(be instanceof BlockEntityWithGui)
+        if (be instanceof BlockEntityWithGui)
             return (BlockEntityWithGui) be;
         throw new IllegalStateException("BlockEntity at pos " + pos + " is not of type UIHolder");
     }
