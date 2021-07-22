@@ -15,9 +15,9 @@ public class SpriteWidget extends Widget {
 
     private final IDrawable drawable;
 
-    public SpriteWidget(IDrawable drawable) {
+    public SpriteWidget(IDrawable drawable, Size size) {
         this.drawable = drawable;
-        setSize(drawable.getTexture().getImageSize());
+        setSize(size);
     }
 
     @Override

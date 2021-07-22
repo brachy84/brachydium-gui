@@ -29,7 +29,7 @@ public abstract class ResourceSlotWidget<T> extends Widget implements Interactab
         if(textures.size() > 0) {
             textures.forEach(sprite -> helper.drawTexture(matrices, sprite, getPos(), getSize()));
         } else {
-            helper.drawTexture(matrices, getFallbackTexture(), getPos());
+            helper.drawTexture(matrices, getFallbackTexture(), getPos(), getSize());
         }
 
         if(!isEmpty())
