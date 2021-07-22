@@ -15,12 +15,12 @@ public class UiFactoryRegistry {
     }
 
     @Nullable
-    public static UIFactory<?> tryGet(Identifier id) {
+    public static UIFactory<?> tryGetFactory(Identifier id) {
         return FACTORIES.get(id);
     }
 
     @Nullable
-    public static Identifier tryGet(UIFactory<?> id) {
+    public static Identifier tryGetId(UIFactory<?> id) {
         return FACTORIES.inverse().get(id);
     }
 }

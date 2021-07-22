@@ -66,13 +66,16 @@ public abstract class Widget {
 
     @ApiStatus.Internal
     public final void drawWidget(MatrixStack matrices, float delta, Pos2d mousePos, boolean foreground) {
-        matrices.push();
-        matrices.translate(0, 0, layer);
-        if (foreground)
-            renderForeground(GuiHelper.create(layer, mousePos), matrices, delta);
-        else
-            render(GuiHelper.create(layer, mousePos), matrices, delta);
-        matrices.pop();
+        if(!isEnabled()) return;
+        if(!size.isZero()) {
+            matrices.push();
+            matrices.translate(0, 0, layer);
+            if (foreground)
+                renderForeground(GuiHelper.create(layer, mousePos), matrices, delta);
+            else
+                render(GuiHelper.create(layer, mousePos), matrices, delta);
+            matrices.pop();
+        }
         children.forEach(widget -> widget.drawWidget(matrices, delta, mousePos, foreground));
     }
 
