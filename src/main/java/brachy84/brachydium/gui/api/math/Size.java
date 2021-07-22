@@ -1,5 +1,7 @@
 package brachy84.brachydium.gui.api.math;
 
+import me.shedaniel.math.Dimension;
+
 import java.util.Objects;
 
 public record Size(float width, float height) {
@@ -10,6 +12,10 @@ public record Size(float width, float height) {
     }
 
     public static final Size ZERO = new Size(0, 0);
+
+    public static Size ofReiDimension(Dimension dimension) {
+        return new Size(dimension.width, dimension.height);
+    }
 
     public boolean isLargerThan(Size size) {
         return (size.width * size.height) < (width * height);
@@ -29,6 +35,10 @@ public record Size(float width, float height) {
 
     public boolean isZero() {
         return width == 0 && height == 0;
+    }
+
+    public Dimension asReiDimension() {
+        return new Dimension((int) width, (int) height);
     }
 
     @Override

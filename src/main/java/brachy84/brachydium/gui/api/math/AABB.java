@@ -1,5 +1,7 @@
 package brachy84.brachydium.gui.api.math;
 
+import me.shedaniel.math.Rectangle;
+
 import java.util.Objects;
 
 /**
@@ -34,6 +36,10 @@ public final class AABB {
      */
     public static AABB ltwh(float x, float y, float width, float height) {
         return new AABB(x, x + width, y, y + height);
+    }
+
+    public static AABB ofReiRectangle(Rectangle rectangle) {
+        return ltwh(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
     }
 
     public boolean isInBounds(float x, float y) {
@@ -74,6 +80,10 @@ public final class AABB {
 
     public Size getSize() {
         return new Size(width, height);
+    }
+
+    public Rectangle asReiRectangle() {
+        return new Rectangle((int)x0, (int)y0, (int)width, (int)height);
     }
 
     @Override

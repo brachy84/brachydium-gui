@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * The base of all Widgets
+ */
 public abstract class Widget {
 
     private static final Logger LOG = LogManager.getLogger("BrachydiumGui");
@@ -284,5 +287,12 @@ public abstract class Widget {
 
     public boolean isInBounds(Pos2d pos) {
         return getBounds().isInBounds(pos);
+    }
+
+    /**
+     * Add Rei widgets to the list which represent together this widget
+     * @param widgets list of rei widgets that represent this widget
+     */
+    public void getReiWidgets(List<me.shedaniel.rei.api.client.gui.widgets.Widget> widgets) {
     }
 }

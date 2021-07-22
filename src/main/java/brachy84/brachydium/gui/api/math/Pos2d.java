@@ -1,5 +1,7 @@
 package brachy84.brachydium.gui.api.math;
 
+import me.shedaniel.math.Point;
+
 import java.util.Objects;
 
 public class Pos2d {
@@ -25,6 +27,10 @@ public class Pos2d {
         float sin = (float) Math.sin(Math.toRadians(angle));
         float cos = (float) Math.cos(Math.toRadians(angle));
         return new Pos2d(cos * length, sin * length);
+    }
+
+    public static Pos2d ofReiPoint(Point point) {
+        return new Pos2d(point.x, point.y);
     }
 
     public Pos2d add(Pos2d p) {
@@ -61,6 +67,10 @@ public class Pos2d {
 
     public boolean isZero() {
         return x == 0 && y == 0;
+    }
+
+    public Point asReiPoint() {
+        return new Point(x, y);
     }
 
     @Override

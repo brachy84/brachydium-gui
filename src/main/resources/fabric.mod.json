@@ -25,6 +25,9 @@
     "client": [
       "brachy84.brachydium.gui.internal.ClientUi"
     ],
+    "rei_plugins": [
+      "brachy84.brachydium.gui.compat.rei.ReiCompat"
+    ],
     "kubejs-init": [
     ]
   },
