@@ -95,12 +95,6 @@ public interface Interactable extends ISyncedWidget {
     default void changeFocus(boolean lookForwards) {}
 
     /**
-     * @param pos to check
-     * @return if the point is within the parents bounds
-     */
-    boolean isMouseOver(Pos2d pos);
-
-    /**
      * @return if left or right ctrl/cmd is pressed
      */
     @Environment(EnvType.CLIENT)

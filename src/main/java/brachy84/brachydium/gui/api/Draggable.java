@@ -1,6 +1,5 @@
 package brachy84.brachydium.gui.api;
 
-import brachy84.brachydium.gui.BrachydiumGui;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.internal.Widget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -8,6 +7,15 @@ import org.jetbrains.annotations.Nullable;
 
 public interface Draggable extends Interactable {
 
+    /**
+     * Get's called from the cursor
+     * Usually you just call {@link Widget#render(IGuiHelper, MatrixStack, float)}
+     * No need to translate
+     *
+     * @param helper   draw helper
+     * @param matrices matrix stack
+     * @param delta    difference from last from
+     */
     void renderMovingState(IGuiHelper helper, MatrixStack matrices, float delta);
 
     /**
@@ -18,14 +26,16 @@ public interface Draggable extends Interactable {
 
     /**
      * The dragging has ended and getState == IDLE
+     *
      * @param successful is false if this returned to it's old position
      */
     void onDragEnd(boolean successful);
 
     /**
      * Gets called when the mouse is released
-     * @param widget current top most widget below the mouse
-     * @param mousePos current mousePos
+     *
+     * @param widget     current top most widget below the mouse
+     * @param mousePos   current mousePos
      * @param isInBounds if the mouse is in the gui bounds
      * @return if the location is valid
      */

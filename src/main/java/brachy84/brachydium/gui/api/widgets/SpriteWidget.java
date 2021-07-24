@@ -21,6 +21,10 @@ public class SpriteWidget extends Widget {
         setSize(size);
     }
 
+    public SpriteWidget(IDrawable drawable, float width, float height) {
+        this(drawable, new Size(width, height));
+    }
+
     @Override
     public void render(IGuiHelper helper, MatrixStack matrices, float delta) {
         helper.drawTexture(matrices, drawable, getPos(), getSize());

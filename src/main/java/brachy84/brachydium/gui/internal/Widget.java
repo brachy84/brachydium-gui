@@ -160,6 +160,17 @@ public abstract class Widget {
         this.children.add(Objects.requireNonNull(widget));
     }
 
+    protected final void setChildInternal(Widget widget) {
+        if (initialised)
+            throw new IllegalStateException("Can't add children after initialised");
+        if (widget instanceof CursorWidget || widget instanceof RootWidget)
+            throw new IllegalArgumentException("CursorSlot or RootWidgets can't be added");
+        if(hasChildren())
+            this.children.set(0, Objects.requireNonNull(widget));
+        else
+            this.children.add(Objects.requireNonNull(widget));
+    }
+
     public Widget addTag(WidgetTag tag) {
         for (WidgetTag tag1 : tags) {
             if (!tag.getCompatPredicate().test(tag1)) {
@@ -170,13 +181,13 @@ public abstract class Widget {
         return this;
     }
 
-    protected Widget setSize(Size size) {
+    public Widget setSize(Size size) {
         this.size = Objects.requireNonNull(size);
         validateSize();
         return this;
     }
 
-    protected Widget setPos(Pos2d pos) {
+    public Widget setPos(Pos2d pos) {
         this.relativePos = Objects.requireNonNull(pos);
         this.alignment = null;
         if (initialised)
@@ -184,7 +195,7 @@ public abstract class Widget {
         return this;
     }
 
-    protected Widget setAbsolutePos(Pos2d pos) {
+    public Widget setAbsolutePos(Pos2d pos) {
         this.pos = Objects.requireNonNull(pos);
         this.alignment = null;
         if (initialised)
@@ -198,7 +209,7 @@ public abstract class Widget {
      * @param alignment alignment
      * @return this
      */
-    protected Widget setAlignment(Alignment alignment) {
+    public Widget setAlignment(Alignment alignment) {
         this.alignment = alignment;
         return this;
     }
@@ -220,7 +231,7 @@ public abstract class Widget {
      *
      * @return this
      */
-    protected Widget unAlign() {
+    public Widget unAlign() {
         this.alignment = null;
         return this;
     }

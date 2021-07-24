@@ -1,7 +1,11 @@
 package brachy84.brachydium.gui.test;
 
+import brachy84.brachydium.gui.api.TextureArea;
 import brachy84.brachydium.gui.api.math.Alignment;
 import brachy84.brachydium.gui.api.math.EdgeInset;
+import brachy84.brachydium.gui.api.math.Size;
+import brachy84.brachydium.gui.api.widgets.DraggableWidget;
+import brachy84.brachydium.gui.api.widgets.SpriteWidget;
 import brachy84.brachydium.gui.internal.BlockEntityWithGui;
 import brachy84.brachydium.gui.internal.Gui;
 import net.minecraft.block.BlockState;
@@ -33,6 +37,10 @@ public class TestBlockEntity extends BlockEntityWithGui {
     public @NotNull Gui createUi(PlayerEntity player) {
         return Gui.defaultBuilder(player)
                 .bindPlayerInventory(EdgeInset.all(7), Alignment.BottomCenter)
+                .widget(new DraggableWidget(
+                        new SpriteWidget(TextureArea.fullImage("brachydiumgui", "icon"),32, 32))
+                        .setAlignment(Alignment.TopCenter)
+                        .setMargin(EdgeInset.top(16)))
                 .build();
     }
 }

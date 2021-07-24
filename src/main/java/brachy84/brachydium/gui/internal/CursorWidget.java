@@ -29,10 +29,11 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
 
     @Override
     public void render(IGuiHelper helper, MatrixStack matrices, float delta) {
+        matrices.push();
+        matrices.translate(0, 0, 500);
         if (!stack.isEmpty())
             renderResource(helper, matrices);
         if (draggable != null) {
-            matrices.push();
             Pos2d mousePos = helper.getMousePos();
             Pos2d draggablePos = ((Widget) draggable).getPos();
             matrices.translate(mousePos.x - draggablePos.x - clickedRelativPos.x, mousePos.y - draggablePos.y - clickedRelativPos.y, 0);
@@ -41,8 +42,8 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
                 ((Widget) draggable).getChildren().forEach(widget -> widget.drawWidget(matrices, delta, mousePos, false));
                 ((Widget) draggable).getChildren().forEach(widget -> widget.drawWidget(matrices, delta, mousePos, true));
             }
-            matrices.pop();
         }
+        matrices.pop();
     }
 
     @Override
@@ -53,11 +54,6 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
     @Override
     public void writeData(PacketByteBuf data) {
         data.writeItemStack(getResource());
-    }
-
-    @Override
-    public boolean isMouseOver(Pos2d pos) {
-        return true;
     }
 
     @Override
@@ -124,7 +120,16 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
         } else if (draggable != null) {
             Pos2d mousePos = getPos();
             boolean successful;
-            if (successful = draggable.canDropHere(null, mousePos, getGui().getBounds().isInBounds(mousePos))) {
+            Widget topWidget = null;
+            for(Widget widget : getGui().getMatchingWidgets(widget -> widget.isInBounds(mousePos))) {
+                if(topWidget == null) {
+                    topWidget = widget;
+                    continue;
+                }
+                if(widget.getLayer() > topWidget.getLayer())
+                    topWidget = widget;
+            }
+            if (successful = draggable.canDropHere(topWidget, mousePos, getGui().getBounds().isInBounds(mousePos))) {
                 ((Widget) draggable).setAbsolutePos(mousePos.subtract(clickedRelativPos));
                 getGui().reBuild();
             }

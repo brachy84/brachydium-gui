@@ -15,7 +15,7 @@ import net.minecraft.util.ActionResult;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> implements Draggable {
+public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
 
     public static final Size SIZE = new Size(18, 18);
 
@@ -28,7 +28,6 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> implements Dra
         setPos(pos);
         this.inv = inv;
         this.index = index;
-        this.dragState = State.IDLE;
     }
 
     @Override
@@ -42,13 +41,11 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> implements Dra
     }
 
     @Override
-    public boolean isMouseOver(Pos2d pos) {
-        return getBounds().isInBounds(pos);
-    }
-
-    @Override
     public void renderResource(IGuiHelper helper, MatrixStack matrices) {
+        matrices.push();
+        matrices.translate(-1, -1.5, 0);
         helper.drawItem(matrices, getResource(), getPos().add(1, 1));
+        matrices.pop();
     }
 
     @Override
@@ -178,31 +175,5 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> implements Dra
         } else {
             setResource(newStack(stack, stack.getCount()));
         }
-    }
-
-    private State dragState;
-
-    @Override
-    public void renderMovingState(IGuiHelper helper, MatrixStack matrices, float delta) {
-        render(helper, matrices, delta);
-    }
-
-    @Override
-    public boolean onDragStart(int button) {
-        return true;
-    }
-
-    @Override
-    public void onDragEnd(boolean successful) {
-    }
-
-    @Override
-    public State getState() {
-        return dragState;
-    }
-
-    @Override
-    public void setState(State state) {
-        this.dragState = state;
     }
 }

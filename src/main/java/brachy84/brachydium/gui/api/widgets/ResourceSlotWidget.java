@@ -91,7 +91,6 @@ public abstract class ResourceSlotWidget<T> extends Widget implements Interactab
      * @return if the resource was successfully set
      */
     public boolean setResource(T resource, Action action) {
-        System.out.println("Try set resource " + resource + " with action " + action);
         if(action == Action.TAKE) {
             if(!canTake(getGui().player)) return false;
         } else if(action == Action.PUT) {

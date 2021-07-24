@@ -7,6 +7,7 @@ public abstract class SingleChildWidget extends Widget {
 
     /**
      * @return the child of the widget, null if it doesn't have a child
+     * if {@link #mustHaveChild()} returns true then this will never bw null
      */
     public @Nullable Widget getChild() {
         return hasChildren() ? getChildren().get(0) : null;
@@ -19,8 +20,8 @@ public abstract class SingleChildWidget extends Widget {
      * @param child of the widget
      * @return the widget so it can be used in a builder
      */
-    public Widget child(Widget child) {
-        addChild(child);
+    public Widget setChild(Widget child) {
+        setChildInternal(child);
         return this;
     }
 
