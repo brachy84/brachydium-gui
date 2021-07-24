@@ -96,7 +96,7 @@ publishing {
 	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
 		maven {
-			url 'https://repo.repsy.io/mvn/${project.maven_group}/${project.archives_base_name}'
+			url "https://repo.repsy.io/mvn/${project.maven_group}/${project.archives_base_name}"
 			credentials {
 				username = System.getenv("REPSY_USERNAME")
 				password = System.getenv("REPSY_PASSWORD")
