@@ -4,6 +4,7 @@ import brachy84.brachydium.gui.api.IDrawable;
 import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.api.Interactable;
 import brachy84.brachydium.gui.api.math.Size;
+import brachy84.brachydium.gui.internal.Widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

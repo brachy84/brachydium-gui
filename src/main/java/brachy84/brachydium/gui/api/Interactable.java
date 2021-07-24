@@ -5,6 +5,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.util.ActionResult;
 import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.glfw.GLFW;
 
@@ -25,9 +26,12 @@ public interface Interactable extends ISyncedWidget {
      * called when clicked on the Interactable based on {@link Interactable#isMouseOver(Pos2d)}
      * @param pos of the mouse
      * @param buttonId the button id (Left == 1, right == 2)
+     * @return determines if further actions are cancelled or not
      */
     @ApiStatus.OverrideOnly
-    default void onClick(Pos2d pos, int buttonId, boolean isDoubleClick) {}
+    default ActionResult onClick(Pos2d pos, int buttonId, boolean isDoubleClick) {
+        return ActionResult.PASS;
+    }
 
     /**
      * called when released a click on the Interactable based on {@link Interactable#isMouseOver(Pos2d)}

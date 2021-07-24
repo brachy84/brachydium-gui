@@ -5,6 +5,7 @@ import brachy84.brachydium.gui.api.math.Alignment;
 import brachy84.brachydium.gui.api.math.EdgeInset;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
+import brachy84.brachydium.gui.internal.Widget;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.Objects;

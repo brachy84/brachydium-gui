@@ -1,5 +1,6 @@
 package brachy84.brachydium.gui.api.widgets;
 
+import brachy84.brachydium.gui.internal.Widget;
 import org.jetbrains.annotations.ApiStatus;
 
 public abstract class MultiChildWidget extends Widget {

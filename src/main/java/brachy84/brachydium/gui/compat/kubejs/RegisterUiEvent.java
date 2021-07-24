@@ -1,4 +1,4 @@
-package brachy84.brachydium.gui.kubejs;
+package brachy84.brachydium.gui.compat.kubejs;
 /*
 import brachy84.brachydium.gui.internal.Gui;
 import dev.latvian.kubejs.server.ServerEventJS;

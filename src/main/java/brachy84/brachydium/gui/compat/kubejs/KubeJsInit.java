@@ -1,4 +1,4 @@
-package brachy84.brachydium.gui.kubejs;
+package brachy84.brachydium.gui.compat.kubejs;
 /*
 import dev.latvian.kubejs.KubeJSInitializer;
 import dev.latvian.kubejs.script.ScriptType;

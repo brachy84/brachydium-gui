@@ -84,6 +84,7 @@ public final class Gui {
         SYNCED_WIDGET_MAP = new Int2ObjectArrayMap<>(syncedWidgets);
         SYNCED_ID_MAP = new Object2IntArrayMap<>(syncedWidgets.inverse());
         SYNCED_ID_MAP.defaultReturnValue(Integer.MIN_VALUE);
+        interactables = new Interactable[0];
     }
 
     public void reBuild() {
@@ -144,7 +145,7 @@ public final class Gui {
     public <T extends Widget & ISyncedWidget> List<T> getMatchingSyncedWidgets(Predicate<T> predicate) {
         List<T> widgets = new ArrayList<>();
         for (ISyncedWidget syncedWidget : getSyncedWidgets()) {
-            if (predicate.test((T) syncedWidget)) {
+            if (!(syncedWidget instanceof CursorWidget) && predicate.test((T) syncedWidget)) {
                 widgets.add((T) syncedWidget);
             }
         }

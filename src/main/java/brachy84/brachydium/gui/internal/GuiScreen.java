@@ -1,16 +1,17 @@
 package brachy84.brachydium.gui.internal;
 
+import brachy84.brachydium.gui.BrachydiumGui;
 import brachy84.brachydium.gui.Networking;
 import brachy84.brachydium.gui.api.ISyncedWidget;
 import brachy84.brachydium.gui.api.Interactable;
 import brachy84.brachydium.gui.api.math.Pos2d;
-import brachy84.brachydium.gui.api.widgets.Widget;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +22,7 @@ import java.util.function.Predicate;
 public class GuiScreen extends Screen implements GuiHelper {
 
     private final Gui gui;
-    private final Interactable[] interactables;
+    //private final Interactable[] interactables;
     private Interactable focused;
     private long lastClick = 0;
     private Interactable lastFocusedClick;
@@ -31,7 +32,7 @@ public class GuiScreen extends Screen implements GuiHelper {
         this.gui = gui;
         this.gui.setScreen(this);
         this.gui.init();
-        interactables = gui.getInteractables();
+        //interactables = gui.getInteractables();
     }
 
     @Override
@@ -55,7 +56,7 @@ public class GuiScreen extends Screen implements GuiHelper {
 
     public <T extends Widget & Interactable> List<T> getMatchingInteractables(Predicate<T> predicate) {
         List<T> interactables = new ArrayList<>();
-        for (Interactable interactable : this.interactables) {
+        for (Interactable interactable : gui.getInteractables()) {
             if (predicate.test((T) interactable)) {
                 interactables.add((T) interactable);
             }
@@ -67,6 +68,7 @@ public class GuiScreen extends Screen implements GuiHelper {
     public Interactable getHoveredInteractable(Pos2d pos) {
         Interactable topWidget = null;
         for (Interactable interactable : getMatchingInteractables(widget -> widget.isInBounds(pos) && widget.isEnabled())) {
+            if(interactable instanceof CursorWidget) continue;
             if (interactable instanceof Widget widgetOld) {
                 if (topWidget == null) {
                     topWidget = interactable;
@@ -105,18 +107,15 @@ public class GuiScreen extends Screen implements GuiHelper {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         Pos2d pos = new Pos2d(mouseX, mouseY);
         Interactable focused = getHoveredInteractable(pos);
+        setFocused(focused);
+        long time = Util.getMeasuringTimeMs();
+        boolean doubleClick = focused == lastFocusedClick && time - lastClick < 500;
+        lastFocusedClick = focused;
         if (focused != null) {
-            long time = Util.getMeasuringTimeMs();
-            boolean doubleClick = focused == lastFocusedClick && time - lastClick < 500;
-
-            focused.onClick(pos, button, doubleClick);
-            gui.getCursor().onClick(pos, button, doubleClick);
-
-            lastFocusedClick = focused;
-            setFocused(focused);
             setDragging(true);
+            if(focused.onClick(pos, button, doubleClick) != ActionResult.PASS) return true;
         }
-        return false;
+        return gui.getCursor().onClick(pos, button, doubleClick) != ActionResult.PASS;
     }
 
     @Override

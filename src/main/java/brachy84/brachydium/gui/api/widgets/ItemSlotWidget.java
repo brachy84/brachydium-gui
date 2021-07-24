@@ -10,11 +10,12 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.ActionResult;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
+public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> implements Draggable {
 
     public static final Size SIZE = new Size(18, 18);
 
@@ -27,6 +28,7 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         setPos(pos);
         this.inv = inv;
         this.index = index;
+        this.dragState = State.IDLE;
     }
 
     @Override
@@ -99,15 +101,17 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
     }
 
     @Override
-    public void onClick(Pos2d pos, int buttonId, boolean isDoubleClick) {
+    public ActionResult onClick(Pos2d pos, int buttonId, boolean isDoubleClick) {
         ItemStack cursorStack = getCursorStack();
         ItemStack slotStack = getResource();
         // Left click
+        if(cursorStack.isEmpty() && slotStack.isEmpty()) {
+            return ActionResult.PASS;
+        }
         if (buttonId == 0) {
             if (Interactable.hasShiftDown()) {
                 transferStack();
             } else if (cursorStack.isEmpty()) {
-                if (slotStack.isEmpty()) return;
                 if (setResource(ItemStack.EMPTY, Action.TAKE))
                     setCursorStack(slotStack.copy());
             } else if (cursorStack.getItem() == slotStack.getItem()) {
@@ -126,7 +130,6 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
             // Right click
         } else if (buttonId == 1) {
             if (cursorStack.isEmpty()) {
-                if (slotStack.isEmpty()) return;
                 int taken = slotStack.getCount() / 2;
                 //slotStack.setCount(slotStack.getCount() - taken);
                 if (setResource(newStack(slotStack, slotStack.getCount() - taken), Action.TAKE))
@@ -151,6 +154,7 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
             sendToServer();
             getGui().getCursor().sendToServer();
         }
+        return ActionResult.SUCCESS;
     }
 
     protected void transferStack() {
@@ -174,5 +178,31 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         } else {
             setResource(newStack(stack, stack.getCount()));
         }
+    }
+
+    private State dragState;
+
+    @Override
+    public void renderMovingState(IGuiHelper helper, MatrixStack matrices, float delta) {
+        render(helper, matrices, delta);
+    }
+
+    @Override
+    public boolean onDragStart(int button) {
+        return true;
+    }
+
+    @Override
+    public void onDragEnd(boolean successful) {
+    }
+
+    @Override
+    public State getState() {
+        return dragState;
+    }
+
+    @Override
+    public void setState(State state) {
+        this.dragState = state;
     }
 }

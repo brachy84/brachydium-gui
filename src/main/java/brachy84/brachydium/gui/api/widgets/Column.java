@@ -3,6 +3,8 @@ package brachy84.brachydium.gui.api.widgets;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.widgets.Layout.CrossAxisAlignment;
 import brachy84.brachydium.gui.api.widgets.Layout.MainAxisAlignment;
+import brachy84.brachydium.gui.internal.GuiUtils;
+import brachy84.brachydium.gui.internal.Widget;
 
 public class Column extends MultiChildWidget {
 
@@ -44,7 +46,7 @@ public class Column extends MultiChildWidget {
         }
         float y = start;
         for (Widget widget : getChildren()) {
-            widget.setPos(new Pos2d(getX(widget), y));
+            GuiUtils.forceWidgetPos(widget, new Pos2d(getX(widget), y));
             y += widget.getSize().height() + spacing;
         }
     }

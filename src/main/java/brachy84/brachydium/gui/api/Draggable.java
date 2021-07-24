@@ -1,7 +1,8 @@
 package brachy84.brachydium.gui.api;
 
+import brachy84.brachydium.gui.BrachydiumGui;
 import brachy84.brachydium.gui.api.math.Pos2d;
-import brachy84.brachydium.gui.api.widgets.Widget;
+import brachy84.brachydium.gui.internal.Widget;
 import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +31,10 @@ public interface Draggable extends Interactable {
      */
     default boolean canDropHere(@Nullable Widget widget, Pos2d mousePos, boolean isInBounds) {
         return isInBounds;
+    }
+
+    default boolean shouldRenderChildren() {
+        return true;
     }
 
     State getState();

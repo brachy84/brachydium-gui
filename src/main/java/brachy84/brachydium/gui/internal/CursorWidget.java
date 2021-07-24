@@ -1,22 +1,26 @@
 package brachy84.brachydium.gui.internal;
 
-import brachy84.brachydium.gui.api.*;
+import brachy84.brachydium.gui.api.Draggable;
+import brachy84.brachydium.gui.api.IDrawable;
+import brachy84.brachydium.gui.api.IGuiHelper;
+import brachy84.brachydium.gui.api.Interactable;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.widgets.ItemSlotWidget;
 import brachy84.brachydium.gui.api.widgets.ResourceSlotWidget;
-import brachy84.brachydium.gui.api.widgets.Widget;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.ActionResult;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 
 public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
 
     private ItemStack stack;
     @Nullable
     private Draggable draggable;
+    private Pos2d clickedRelativPos;
 
     public CursorWidget() {
         setSize(ItemSlotWidget.SIZE);
@@ -25,10 +29,20 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
 
     @Override
     public void render(IGuiHelper helper, MatrixStack matrices, float delta) {
-        if(!stack.isEmpty())
+        if (!stack.isEmpty())
             renderResource(helper, matrices);
-        if(draggable != null)
+        if (draggable != null) {
+            matrices.push();
+            Pos2d mousePos = helper.getMousePos();
+            Pos2d draggablePos = ((Widget) draggable).getPos();
+            matrices.translate(mousePos.x - draggablePos.x - clickedRelativPos.x, mousePos.y - draggablePos.y - clickedRelativPos.y, 0);
             draggable.renderMovingState(helper, matrices, delta);
+            if (draggable.shouldRenderChildren()) {
+                ((Widget) draggable).getChildren().forEach(widget -> widget.drawWidget(matrices, delta, mousePos, false));
+                ((Widget) draggable).getChildren().forEach(widget -> widget.drawWidget(matrices, delta, mousePos, true));
+            }
+            matrices.pop();
+        }
     }
 
     @Override
@@ -67,9 +81,20 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
     @Override
     public boolean setResource(ItemStack resource) {
         if (resource == null) return false;
-        System.out.println("Set cursor stack to " + resource);
         stack = resource;
         return true;
+    }
+
+    @Override
+    public Pos2d getPos() {
+        double scaleFactor = MinecraftClient.getInstance().getWindow().getScaleFactor();
+        Mouse mouse = MinecraftClient.getInstance().mouse;
+        return new Pos2d(mouse.getX() / scaleFactor, mouse.getY() / scaleFactor);
+    }
+
+    @Override
+    public Pos2d getRelativePos() {
+        return getPos();
     }
 
     @Override
@@ -82,7 +107,33 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
         return null;
     }
 
-    private  <T extends Widget & Interactable> T getFocused() {
+    private <T extends Widget & Interactable> T getFocused() {
         return (T) getGui().getScreen().getFocusedWidget();
+    }
+
+    @Override
+    public ActionResult onClick(Pos2d pos, int buttonId, boolean isDoubleClick) {
+        if (getFocused() instanceof Draggable draggable && isEmpty()) {
+            if (!draggable.onDragStart(buttonId))
+                return ActionResult.PASS;
+            ((Widget) draggable).setEnabled(false);
+            draggable.setState(Draggable.State.MOVING);
+            this.draggable = draggable;
+            this.clickedRelativPos = getPos().subtract(((Widget) draggable).getPos());
+            return ActionResult.SUCCESS;
+        } else if (draggable != null) {
+            Pos2d mousePos = getPos();
+            boolean successful;
+            if (successful = draggable.canDropHere(null, mousePos, getGui().getBounds().isInBounds(mousePos))) {
+                ((Widget) draggable).setAbsolutePos(mousePos.subtract(clickedRelativPos));
+                getGui().reBuild();
+            }
+            draggable.onDragEnd(successful);
+            ((Widget) draggable).setEnabled(true);
+            draggable.setState(Draggable.State.IDLE);
+            draggable = null;
+            return ActionResult.SUCCESS;
+        }
+        return ActionResult.PASS;
     }
 }

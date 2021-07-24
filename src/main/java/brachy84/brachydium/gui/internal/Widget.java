@@ -1,11 +1,12 @@
-package brachy84.brachydium.gui.api.widgets;
+package brachy84.brachydium.gui.internal;
 
+import brachy84.brachydium.gui.api.Draggable;
 import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.api.WidgetTag;
 import brachy84.brachydium.gui.api.math.*;
-import brachy84.brachydium.gui.internal.CursorWidget;
-import brachy84.brachydium.gui.internal.Gui;
-import brachy84.brachydium.gui.internal.GuiHelper;
+import brachy84.brachydium.gui.api.widgets.MultiChildWidget;
+import brachy84.brachydium.gui.api.widgets.RootWidget;
+import brachy84.brachydium.gui.api.widgets.SingleChildWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,6 +57,8 @@ public abstract class Widget {
             throw new IllegalStateException("Init should only be called once from Gui");
         if (this instanceof SingleChildWidget widget && widget.mustHaveChild() && !hasChildren())
             throw new IllegalStateException("Widget is marked as 'mustHaveChild', but doesn't have a child");
+        if(this instanceof Draggable)
+            ((Draggable) this).setState(Draggable.State.IDLE);
         validateSize();
         this.gui = gui;
         this.parent = Objects.requireNonNull(parent);

@@ -1,6 +1,7 @@
 package brachy84.brachydium.gui.api.widgets;
 
 import brachy84.brachydium.gui.api.math.Alignment;
+import brachy84.brachydium.gui.internal.Widget;
 
 import java.util.Objects;
 
