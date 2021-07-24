@@ -4,10 +4,10 @@ To include Brachydium Gui in your mod, use this:
 ```gradle
 repositories {
 	maven {
-		url = "https://repo.repsy.io/mvn/brachy84/"
+		url "https://repo.repsy.io/mvn/brachy84/brachydium-gui"
 	}
 }
 dependencies {
-	include 'brachy84:brachydium-gui:0.0.1'
+	include modImplementation('brachy84:brachydium-gui:0.0.2')
 }
 ```
