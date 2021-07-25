@@ -1,9 +1,13 @@
 package brachy84.brachydium.gui.api.widgets;
 
 import brachy84.brachydium.gui.api.*;
+import brachy84.brachydium.gui.api.math.AABB;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
+import brachy84.brachydium.gui.internal.GuiHelper;
 import brachy84.brachydium.gui.internal.TransferStackHandler;
+import me.shedaniel.rei.api.client.gui.widgets.Widget;
+import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.inventory.Inventory;
@@ -22,12 +26,14 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
     private final Inventory inv;
     private final int index;
     private ItemTransferTag tag;
+    private int mark;
 
     public ItemSlotWidget(Inventory inv, int index, Pos2d pos) {
         setSize(SIZE);
         setPos(pos);
         this.inv = inv;
         this.index = index;
+        this.mark = 0;
     }
 
     @Override
@@ -94,6 +100,20 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
             this.tag = (ItemTransferTag) tag;
         }
         super.addTag(tag);
+        return this;
+    }
+
+    public ItemSlotWidget markInput() {
+        this.mark = 1;
+        if(this.tag == null)
+            addTag(ItemTransferTag.INPUT);
+        return this;
+    }
+
+    public ItemSlotWidget markOutput() {
+        this.mark = 2;
+        if(this.tag == null)
+            addTag(ItemTransferTag.OUTPUT);
         return this;
     }
 
@@ -175,5 +195,29 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         } else {
             setResource(newStack(stack, stack.getCount()));
         }
+    }
+
+    @Override
+    public void getReiWidgets(List<Widget> widgets, AABB bounds, Pos2d reiPos) {
+        //Pos2d reiPos = bounds.getTopLeft().add(getRelativePos());
+        me.shedaniel.rei.api.client.gui.widgets.Slot slot = Widgets.createSlot(reiPos.add(new Pos2d(1, 1)).asReiPoint());
+        slot.backgroundEnabled(false);
+        if (tag == ItemTransferTag.INPUT || mark == 1) {
+            slot.markInput();
+        } else if (tag == ItemTransferTag.OUTPUT || mark == 2) {
+            slot.markOutput();
+        }
+        widgets.add(slot);
+        Widget render = Widgets.createDrawableWidget(((helper, matrices, mouseX, mouseY, delta) -> {
+            GuiHelper guiHelper = GuiHelper.create(0, new Pos2d(mouseX, mouseY));
+            if (getTextures().size() > 0) {
+                for (IDrawable drawable : getTextures()) {
+                    guiHelper.drawTexture(matrices, drawable, reiPos, getSize());
+                }
+            } else {
+                guiHelper.drawTexture(matrices, getFallbackTexture(), reiPos, getSize());
+            }
+        }));
+        widgets.add(render);
     }
 }

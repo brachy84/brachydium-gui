@@ -57,15 +57,15 @@ public abstract class Widget {
             throw new IllegalStateException("Init should only be called once from Gui");
         if (this instanceof SingleChildWidget widget && widget.mustHaveChild() && !hasChildren())
             throw new IllegalStateException("Widget is marked as 'mustHaveChild', but doesn't have a child");
-        if(this instanceof Draggable)
+        if (this instanceof Draggable)
             ((Draggable) this).setState(Draggable.State.IDLE);
         validateSize();
         this.gui = gui;
         this.parent = Objects.requireNonNull(parent);
         this.layer = layer;
+        this.initialised = true;
         rePosition();
         onInit();
-        this.initialised = true;
         for (Widget widgetOld : children) {
             widgetOld.init(gui, this, layer + 10);
         }
@@ -73,8 +73,8 @@ public abstract class Widget {
 
     @ApiStatus.Internal
     public final void drawWidget(MatrixStack matrices, float delta, Pos2d mousePos, boolean foreground) {
-        if(!isEnabled()) return;
-        if(!size.isZero()) {
+        if (!isEnabled()) return;
+        if (!size.isZero()) {
             matrices.push();
             matrices.translate(0, 0, layer);
             if (foreground)
@@ -165,7 +165,7 @@ public abstract class Widget {
             throw new IllegalStateException("Can't add children after initialised");
         if (widget instanceof CursorWidget || widget instanceof RootWidget)
             throw new IllegalArgumentException("CursorSlot or RootWidgets can't be added");
-        if(hasChildren())
+        if (hasChildren())
             this.children.set(0, Objects.requireNonNull(widget));
         else
             this.children.add(Objects.requireNonNull(widget));
@@ -306,8 +306,11 @@ public abstract class Widget {
 
     /**
      * Add Rei widgets to the list which represent together this widget
+     *
      * @param widgets list of rei widgets that represent this widget
+     * @param bounds  the bounds of the recipe screen
+     * @param reiPos  the new pos to use for rei
      */
-    public void getReiWidgets(List<me.shedaniel.rei.api.client.gui.widgets.Widget> widgets) {
+    public void getReiWidgets(List<me.shedaniel.rei.api.client.gui.widgets.Widget> widgets, AABB bounds, Pos2d reiPos) {
     }
 }
