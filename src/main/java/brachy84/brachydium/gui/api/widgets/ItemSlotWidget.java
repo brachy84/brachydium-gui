@@ -6,34 +6,44 @@ import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
 import brachy84.brachydium.gui.internal.GuiHelper;
 import brachy84.brachydium.gui.internal.TransferStackHandler;
+import brachy84.brachydium.gui.internal.wrapper.ItemSlotWrapper;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.ActionResult;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
 
     public static final Size SIZE = new Size(18, 18);
 
-    private final Inventory inv;
-    private final int index;
+    private final ItemSlotWrapper itemSlot;
     private ItemTransferTag tag;
     private int mark;
 
-    public ItemSlotWidget(Inventory inv, int index, Pos2d pos) {
+    public ItemSlotWidget(ItemSlotWrapper itemSlot, Pos2d pos) {
+        this.itemSlot = itemSlot;
+        this.mark = 0;
         setSize(SIZE);
         setPos(pos);
-        this.inv = inv;
-        this.index = index;
-        this.mark = 0;
+    }
+
+    public ItemSlotWidget(Inventory inv, int index, Pos2d pos) {
+        this(new ItemSlotWrapper(inv, index), pos);
+    }
+
+    public ItemSlotWidget(Supplier<ItemStack> getter, Consumer<ItemStack> setter, Pos2d pos) {
+        this(new ItemSlotWrapper(getter, setter), pos);
     }
 
     @Override
@@ -61,12 +71,12 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
 
     @Override
     public ItemStack getResource() {
-        return inv.getStack(index);
+        return itemSlot.getStack();
     }
 
     @Override
     public boolean setResource(ItemStack resource) {
-        inv.setStack(index, resource);
+        itemSlot.setStack(resource);
         return true;
     }
 
@@ -180,20 +190,25 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         if (!canTake(getGui().player)) return;
         WidgetTag[] order = TransferStackHandler.getTargetOrder(tag);
         List<ItemSlotWidget> itemSlots = getGui().getMatchingSyncedWidgets(widget -> widget instanceof ItemSlotWidget);
-        outer:
-        for (WidgetTag tag : order) {
-            for (ItemSlotWidget slot : itemSlots.stream().filter(widget -> widget.tag == tag).collect(Collectors.toList())) {
-                if (slot == this) continue;
-                Slot mcSlot = new Slot(slot.inv, slot.index, 0, 0);
-                stack = mcSlot.insertStack(stack);
-                if (stack.getCount() == 0)
-                    break outer;
+        long toInsert = stack.getCount();
+        try(Transaction transaction = Transaction.openOuter()) {
+            outer:
+            for (WidgetTag tag : order) {
+                for (ItemSlotWidget slot : itemSlots.stream().filter(widget -> widget.tag == tag).collect(Collectors.toList())) {
+                    if (slot == this) continue;
+                    toInsert -= slot.itemSlot.insert(ItemVariant.of(stack), toInsert, transaction);
+                    //Slot mcSlot = new Slot(slot.inv, slot.index, 0, 0);
+                    //stack = mcSlot.insertStack(stack);
+                    if (toInsert == 0)
+                        break outer;
+                }
             }
+            transaction.commit();
         }
-        if (stack.getCount() == 0) {
+        if (toInsert == 0) {
             setResource(ItemStack.EMPTY);
         } else {
-            setResource(newStack(stack, stack.getCount()));
+            setResource(newStack(stack, (int) toInsert));
         }
     }
 
