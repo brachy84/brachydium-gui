@@ -59,7 +59,7 @@ public interface ISyncedWidget {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player != null) {
             PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeInt(UiHandler.getCurrentGui(player).findIdForSyncedWidget(this));
+            buf.writeInt(UiHandler.getCurrentGuiClient().findIdForSyncedWidget(this));
             writeData(buf);
             ClientPlayNetworking.send(Networking.WIDGET_UPDATE, buf);
         }

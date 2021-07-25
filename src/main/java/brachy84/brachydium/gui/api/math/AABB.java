@@ -50,13 +50,30 @@ public final class AABB {
         return isInBounds(pos.getX(), pos.getY());
     }
 
+    /**
+     * @param bounds to check
+     * @return if bounds are partly inside this bounds
+     */
     public boolean intersects(AABB bounds) {
         for (Alignment alignment : Alignment.CORNERS) {
-            if (isInBounds(corner(alignment))) {
+            if (isInBounds(bounds.corner(alignment))) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * @param bounds to check
+     * @return if bounds are fully inside this bounds
+     */
+    public boolean covers(AABB bounds) {
+        for(Alignment alignment : Alignment.CORNERS) {
+            if(!isInBounds(bounds.corner(alignment))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public Pos2d getCenter() {

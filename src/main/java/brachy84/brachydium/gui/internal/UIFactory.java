@@ -40,7 +40,7 @@ public abstract class UIFactory<T extends UIHolder> {
 
     @ApiStatus.Internal
     @Environment(EnvType.CLIENT)
-    public final void openClientUi(UIHolder uiHolder) {
+    protected final void openClientUi(UIHolder uiHolder) {
         Gui gui = uiHolder.createUi(MinecraftClient.getInstance().player);
         MinecraftClient.getInstance().setScreen(new GuiScreen(gui));
     }

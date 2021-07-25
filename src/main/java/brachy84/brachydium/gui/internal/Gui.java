@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public final class Gui {
@@ -68,7 +69,6 @@ public final class Gui {
 
     @ApiStatus.Internal
     public void init() {
-        System.out.println("Init GUI");
         SCREEN_WIDGET.setSize(getScreenSize());
         root.init(this, SCREEN_WIDGET, 0);
         cursorSlot.init(this, SCREEN_WIDGET, 100);
@@ -80,7 +80,6 @@ public final class Gui {
                 syncedWidgets.forcePut(syncId.getAndIncrement(), (ISyncedWidget) widget);
             }
         });
-        System.out.println("Setting synced maps");
         SYNCED_WIDGET_MAP = new Int2ObjectArrayMap<>(syncedWidgets);
         SYNCED_ID_MAP = new Object2IntArrayMap<>(syncedWidgets.inverse());
         SYNCED_ID_MAP.defaultReturnValue(Integer.MIN_VALUE);
@@ -100,6 +99,10 @@ public final class Gui {
         root.drawWidget(matrices, delta, mousePos, false);
         root.drawWidget(matrices, delta, mousePos, true);
         cursorSlot.drawWidget(matrices, delta, mousePos, false);
+    }
+
+    public void forEachWidget(Consumer<Widget> consumer) {
+        root.forAllChildren(consumer);
     }
 
     public void onScreenResize() {

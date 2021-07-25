@@ -1,8 +1,11 @@
 package brachy84.brachydium.gui.internal;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,12 +26,15 @@ public class UiHandler {
     }
 
     @Nullable
-    public static Gui getCurrentGui(ServerPlayerEntity player) {
-        return SCREEN_MAP.get(player);
+    public static Gui getCurrentGui(PlayerEntity player) {
+        if(player instanceof ServerPlayerEntity)
+            return SCREEN_MAP.get(player);
+        return getCurrentGuiClient();
     }
 
+    @Environment(EnvType.CLIENT)
     @Nullable
-    public static Gui getCurrentGui(ClientPlayerEntity player) {
+    public static Gui getCurrentGuiClient() {
         Screen screen = MinecraftClient.getInstance().currentScreen;
         if(screen instanceof GuiScreen)
             return ((GuiScreen) screen).getGui();
