@@ -24,6 +24,6 @@ public class BrachydiumGui implements ModInitializer {
     @Override
     public void onInitialize() {
         ServerUi.init();
-        UiFactoryRegistry.register(BlockEntityUiFactory.INSTANCE.getId(), BlockEntityUiFactory.INSTANCE);
+        UiFactoryRegistry.register(BlockEntityUiFactory.INSTANCE);
     }
 }

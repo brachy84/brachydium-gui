@@ -6,12 +6,18 @@ import com.google.common.collect.HashBiMap;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class UiFactoryRegistry {
 
     private static final BiMap<Identifier, UIFactory<?>> FACTORIES = HashBiMap.create(0);
 
-    public static void register(Identifier id, UIFactory<?> factory) {
-        FACTORIES.forcePut(id, factory);
+    public static void register(UIFactory<?> factory) {
+        Objects.requireNonNull(factory, "UIFactory is null during registry");
+        Objects.requireNonNull(factory.getId(), "UIFactory ID is null during registry");
+        if(FACTORIES.containsKey(factory.getId()))
+            throw new IllegalStateException("Can't register factory {} since it already exists!");
+        FACTORIES.forcePut(factory.getId(), factory);
     }
 
     @Nullable
