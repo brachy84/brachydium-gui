@@ -15,6 +15,7 @@ public class TransferStackHandler {
         registerSlotTag(ItemTransferTag.OUTPUT, ItemTransferTag.PLAYER_INV, ItemTransferTag.HOTBAR);
         registerSlotTag(ItemTransferTag.HOTBAR, ItemTransferTag.INPUT, ItemTransferTag.PLAYER_INV);
         registerSlotTag(ItemTransferTag.PLAYER_INV, ItemTransferTag.INPUT, ItemTransferTag.HOTBAR);
+        registerSlotTag(ItemTransferTag.STORAGE, ItemTransferTag.PLAYER_INV, ItemTransferTag.HOTBAR);
     }
 
     /**
