@@ -6,13 +6,13 @@ import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
 import brachy84.brachydium.gui.internal.GuiHelper;
 import brachy84.brachydium.gui.internal.TransferStackHandler;
-import brachy84.brachydium.gui.internal.wrapper.ItemSlotWrapper;
+import brachy84.brachydium.gui.internal.wrapper.IModifiableStorage;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -20,6 +20,7 @@ import net.minecraft.util.ActionResult;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -27,23 +28,30 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
 
     public static final Size SIZE = new Size(18, 18);
 
-    private final ItemSlotWrapper itemSlot;
+    private final Supplier<ItemStack> getter;
+    private final Consumer<ItemStack> setter;
+    private final Predicate<ItemStack> canInsert;
     private ItemTransferTag tag;
     private int mark;
 
-    public ItemSlotWidget(ItemSlotWrapper itemSlot, Pos2d pos) {
-        this.itemSlot = itemSlot;
-        this.mark = 0;
-        setSize(SIZE);
-        setPos(pos);
+    public ItemSlotWidget(IModifiableStorage<ItemVariant> itemSlot, Pos2d pos) {
+        this(() -> itemSlot.getResource().toStack((int) itemSlot.getAmount()),
+                stack -> itemSlot.setResource(ItemVariant.of(stack), stack.getCount()),
+                stack -> itemSlot.canInsert(ItemVariant.of(stack)),
+                pos);
     }
 
     public ItemSlotWidget(Inventory inv, int index, Pos2d pos) {
-        this(new ItemSlotWrapper(inv, index), pos);
+        this(() -> inv.getStack(index), stack -> inv.setStack(index, stack), stack -> inv.isValid(index, stack), pos);
     }
 
-    public ItemSlotWidget(Supplier<ItemStack> getter, Consumer<ItemStack> setter, Pos2d pos) {
-        this(new ItemSlotWrapper(getter, setter), pos);
+    public ItemSlotWidget(Supplier<ItemStack> getter, Consumer<ItemStack> setter, Predicate<ItemStack> canInsert, Pos2d pos) {
+        this.setter = setter;
+        this.getter = getter;
+        this.canInsert = canInsert;
+        this.mark = 0;
+        setSize(SIZE);
+        setPos(pos);
     }
 
     @Override
@@ -71,13 +79,29 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
 
     @Override
     public ItemStack getResource() {
-        return itemSlot.getStack();
+        return getter.get();
     }
 
     @Override
     public boolean setResource(ItemStack resource) {
-        itemSlot.setStack(resource);
+        setter.accept(resource);
         return true;
+    }
+
+    public int insert(ItemStack stack) {
+        ItemStack origin = getResource();
+        if (!isEmpty() && (!ItemStack.areItemsEqual(stack, origin) || !ItemStack.areNbtEqual(stack, origin)))
+            return 0;
+        int toInsert = Math.min(stack.getCount(), origin.getMaxCount() - origin.getCount());
+        if(toInsert == 0) return 0;
+        stack.setCount(origin.getCount() + toInsert);
+        setResource(stack, Action.PUT);
+        return toInsert;
+    }
+
+    @Override
+    public boolean canPut(ItemStack resource, PlayerEntity player) {
+        return canInsert.test(resource);
     }
 
     public void setCursorStack(ItemStack stack) {
@@ -115,14 +139,14 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
 
     public ItemSlotWidget markInput() {
         this.mark = 1;
-        if(this.tag == null)
+        if (this.tag == null)
             addTag(ItemTransferTag.INPUT);
         return this;
     }
 
     public ItemSlotWidget markOutput() {
         this.mark = 2;
-        if(this.tag == null)
+        if (this.tag == null)
             addTag(ItemTransferTag.OUTPUT);
         return this;
     }
@@ -132,7 +156,7 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         ItemStack cursorStack = getCursorStack();
         ItemStack slotStack = getResource();
         // Left click
-        if(cursorStack.isEmpty() && slotStack.isEmpty()) {
+        if (cursorStack.isEmpty() && slotStack.isEmpty()) {
             return ActionResult.PASS;
         }
         if (buttonId == 0) {
@@ -173,7 +197,7 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
             // Scroll click
         } else if (buttonId == 2) {
             if (getGui().player.isCreative() && !slotStack.isEmpty()) {
-                setCursorStack(new ItemStack(slotStack.getItem(), slotStack.getMaxCount()));
+                setCursorStack(newStack(slotStack, slotStack.getMaxCount()));
             }
         }
         // lastly simply sync the slot and the cursor slot to the client
@@ -190,25 +214,21 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         if (!canTake(getGui().player)) return;
         WidgetTag[] order = TransferStackHandler.getTargetOrder(tag);
         List<ItemSlotWidget> itemSlots = getGui().getMatchingSyncedWidgets(widget -> widget instanceof ItemSlotWidget);
-        long toInsert = stack.getCount();
-        try(Transaction transaction = Transaction.openOuter()) {
-            outer:
-            for (WidgetTag tag : order) {
-                for (ItemSlotWidget slot : itemSlots.stream().filter(widget -> widget.tag == tag).collect(Collectors.toList())) {
-                    if (slot == this) continue;
-                    toInsert -= slot.itemSlot.insert(ItemVariant.of(stack), toInsert, transaction);
-                    //Slot mcSlot = new Slot(slot.inv, slot.index, 0, 0);
-                    //stack = mcSlot.insertStack(stack);
-                    if (toInsert == 0)
-                        break outer;
-                }
+        int toInsert = stack.getCount();
+        outer:
+        for (WidgetTag tag : order) {
+            for (ItemSlotWidget slot : itemSlots.stream().filter(widget -> widget.tag == tag).collect(Collectors.toList())) {
+                if (slot == this) continue;
+                stack.setCount(toInsert);
+                toInsert -= slot.insert(stack);
+                if (toInsert == 0)
+                    break outer;
             }
-            transaction.commit();
         }
         if (toInsert == 0) {
             setResource(ItemStack.EMPTY);
         } else {
-            setResource(newStack(stack, (int) toInsert));
+            setResource(newStack(stack, toInsert));
         }
     }
 
