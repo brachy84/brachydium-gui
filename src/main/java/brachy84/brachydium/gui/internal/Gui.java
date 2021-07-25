@@ -145,10 +145,10 @@ public final class Gui {
         return widgetOlds;
     }
 
-    public <T extends Widget & ISyncedWidget> List<T> getMatchingSyncedWidgets(Predicate<T> predicate) {
+    public <T extends Widget & ISyncedWidget> List<T> getMatchingSyncedWidgets(Predicate<ISyncedWidget> predicate) {
         List<T> widgets = new ArrayList<>();
         for (ISyncedWidget syncedWidget : getSyncedWidgets()) {
-            if (!(syncedWidget instanceof CursorWidget) && predicate.test((T) syncedWidget)) {
+            if (!(syncedWidget instanceof CursorWidget) && predicate.test(syncedWidget)) {
                 widgets.add((T) syncedWidget);
             }
         }
