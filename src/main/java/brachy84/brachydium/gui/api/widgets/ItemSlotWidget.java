@@ -16,9 +16,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.ActionResult;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -30,28 +32,34 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
 
     private final Supplier<ItemStack> getter;
     private final Consumer<ItemStack> setter;
-    private final Predicate<ItemStack> canInsert;
+    private Predicate<ItemStack> canInsert;
     private ItemTransferTag tag;
     private int mark;
 
     public ItemSlotWidget(IModifiableStorage<ItemVariant> itemSlot, Pos2d pos) {
         this(() -> itemSlot.getResource().toStack((int) itemSlot.getAmount()),
                 stack -> itemSlot.setResource(ItemVariant.of(stack), stack.getCount()),
-                stack -> itemSlot.canInsert(ItemVariant.of(stack)),
                 pos);
+        setInsertPredicate(stack -> itemSlot.canInsert(ItemVariant.of(stack)));
     }
 
     public ItemSlotWidget(Inventory inv, int index, Pos2d pos) {
-        this(() -> inv.getStack(index), stack -> inv.setStack(index, stack), stack -> inv.isValid(index, stack), pos);
+        this(() -> inv.getStack(index), stack -> inv.setStack(index, stack), pos);
+        setInsertPredicate(stack -> inv.isValid(index, stack));
     }
 
-    public ItemSlotWidget(Supplier<ItemStack> getter, Consumer<ItemStack> setter, Predicate<ItemStack> canInsert, Pos2d pos) {
+    public ItemSlotWidget(Slot slot, Pos2d pos) {
+        this(slot::getStack, slot::setStack, pos);
+        setInsertPredicate(slot::canInsert);
+    }
+
+    public ItemSlotWidget(Supplier<ItemStack> getter, Consumer<ItemStack> setter, Pos2d pos) {
         this.setter = setter;
         this.getter = getter;
-        this.canInsert = canInsert;
         this.mark = 0;
         setSize(SIZE);
         setPos(pos);
+        setInsertPredicate(stack -> true);
     }
 
     @Override
@@ -148,6 +156,11 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         this.mark = 2;
         if (this.tag == null)
             addTag(ItemTransferTag.OUTPUT);
+        return this;
+    }
+
+    public ItemSlotWidget setInsertPredicate(Predicate<ItemStack> insertPredicate) {
+        this.canInsert = Objects.requireNonNull(insertPredicate);
         return this;
     }
 
