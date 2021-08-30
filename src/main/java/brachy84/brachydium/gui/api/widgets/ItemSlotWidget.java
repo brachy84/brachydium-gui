@@ -5,7 +5,6 @@ import brachy84.brachydium.gui.api.math.AABB;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
 import brachy84.brachydium.gui.internal.GuiHelper;
-import brachy84.brachydium.gui.internal.TransferStackHandler;
 import brachy84.brachydium.gui.internal.wrapper.IModifiableStorage;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
@@ -178,7 +177,7 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
             } else if (cursorStack.isEmpty()) {
                 if (setResource(ItemStack.EMPTY, Action.TAKE))
                     setCursorStack(slotStack.copy());
-            } else if (cursorStack.getItem() == slotStack.getItem()) {
+            } else if (cursorStack.getItem() == slotStack.getItem() && ItemStack.areNbtEqual(cursorStack, slotStack)) {
                 int cursorAmount = cursorStack.getCount();
                 int slotAmount = slotStack.getCount();
                 int moved = Math.min(cursorAmount, slotStack.getItem().getMaxCount() - slotAmount);
@@ -201,7 +200,7 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
             } else if (slotStack.isEmpty()) {
                 if (setResource(new ItemStack(cursorStack.getItem()), Action.PUT))
                     setCursorStack(newStack(cursorStack, cursorStack.getCount() - 1));
-            } else if (slotStack.getItem() == cursorStack.getItem()) {
+            } else if (slotStack.getItem() == cursorStack.getItem() && ItemStack.areNbtEqual(cursorStack, slotStack)) {
                 if (slotStack.getItem().getMaxCount() - slotStack.getCount() >= 1) {
                     if (setResource(newStack(slotStack, slotStack.getCount() + 1), Action.PUT))
                         setCursorStack(newStack(cursorStack, cursorStack.getCount() - 1));
@@ -259,7 +258,7 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         Widget render = Widgets.createDrawableWidget(((helper, matrices, mouseX, mouseY, delta) -> {
             GuiHelper guiHelper = GuiHelper.create(0, new Pos2d(mouseX, mouseY));
             if (getTextures().size() > 0) {
-                for (IDrawable drawable : getTextures()) {
+                for (ITexture drawable : getTextures()) {
                     guiHelper.drawTexture(matrices, drawable, reiPos, getSize());
                 }
             } else {

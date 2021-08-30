@@ -1,7 +1,7 @@
 package brachy84.brachydium.gui.internal;
 
 import brachy84.brachydium.gui.api.Draggable;
-import brachy84.brachydium.gui.api.IDrawable;
+import brachy84.brachydium.gui.api.ITexture;
 import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.api.Interactable;
 import brachy84.brachydium.gui.api.math.Pos2d;
@@ -99,7 +99,7 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
     }
 
     @Override
-    public IDrawable getFallbackTexture() {
+    public ITexture getFallbackTexture() {
         return null;
     }
 

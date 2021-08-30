@@ -1,6 +1,6 @@
 package brachy84.brachydium.gui.internal;
 
-import brachy84.brachydium.gui.api.IDrawable;
+import brachy84.brachydium.gui.api.ITexture;
 import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.api.TextureArea;
 import brachy84.brachydium.gui.api.math.AABB;
@@ -83,7 +83,7 @@ public interface GuiHelper extends IGuiHelper {
     }
 
     @Override
-    default void drawTexture(MatrixStack matrices, IDrawable drawable, Pos2d pos, Size drawSize) {
+    default void drawTexture(MatrixStack matrices, ITexture drawable, Pos2d pos, Size drawSize) {
         Matrix4f matrix4f = matrices.peek().getModel();
 
         AABB bounds = AABB.of(drawSize, pos);

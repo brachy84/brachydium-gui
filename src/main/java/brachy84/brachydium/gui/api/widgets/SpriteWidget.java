@@ -1,6 +1,6 @@
 package brachy84.brachydium.gui.api.widgets;
 
-import brachy84.brachydium.gui.api.IDrawable;
+import brachy84.brachydium.gui.api.ITexture;
 import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.api.math.Alignment;
 import brachy84.brachydium.gui.api.math.Pos2d;
@@ -14,14 +14,14 @@ import net.minecraft.client.util.math.MatrixStack;
  */
 public class SpriteWidget extends Widget {
 
-    private final IDrawable drawable;
+    private final ITexture drawable;
 
-    public SpriteWidget(IDrawable drawable, Size size) {
+    public SpriteWidget(ITexture drawable, Size size) {
         this.drawable = drawable;
         setSize(size);
     }
 
-    public SpriteWidget(IDrawable drawable, float width, float height) {
+    public SpriteWidget(ITexture drawable, float width, float height) {
         this(drawable, new Size(width, height));
     }
 
@@ -30,7 +30,7 @@ public class SpriteWidget extends Widget {
         helper.drawTexture(matrices, drawable, getPos(), getSize());
     }
 
-    public IDrawable getDrawable() {
+    public ITexture getDrawable() {
         return drawable;
     }
 

@@ -1,18 +1,10 @@
 package brachy84.brachydium.gui.api;
 
-import java.util.function.Supplier;
+import brachy84.brachydium.gui.api.math.Pos2d;
+import net.minecraft.client.util.math.MatrixStack;
 
-/**
- * A Drawable is basically a {@link TextureArea} supplier
- * and A TextureArea is a IDrawable that returns itself
- */
 @FunctionalInterface
-public interface IDrawable extends Supplier<TextureArea> {
+public interface IDrawable {
 
-    TextureArea getTexture();
-
-    @Override
-    default TextureArea get() {
-        return getTexture();
-    }
+    void draw(MatrixStack matrices, Pos2d mousePos, float delta);
 }

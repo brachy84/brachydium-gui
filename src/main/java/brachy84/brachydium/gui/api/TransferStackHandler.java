@@ -1,7 +1,4 @@
-package brachy84.brachydium.gui.internal;
-
-import brachy84.brachydium.gui.api.ItemTransferTag;
-import brachy84.brachydium.gui.api.WidgetTag;
+package brachy84.brachydium.gui.api;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,8 +10,8 @@ public class TransferStackHandler {
     static {
         registerSlotTag(ItemTransferTag.INPUT, ItemTransferTag.PLAYER_INV, ItemTransferTag.HOTBAR);
         registerSlotTag(ItemTransferTag.OUTPUT, ItemTransferTag.PLAYER_INV, ItemTransferTag.HOTBAR);
-        registerSlotTag(ItemTransferTag.HOTBAR, ItemTransferTag.INPUT, ItemTransferTag.PLAYER_INV);
-        registerSlotTag(ItemTransferTag.PLAYER_INV, ItemTransferTag.INPUT, ItemTransferTag.HOTBAR);
+        registerSlotTag(ItemTransferTag.HOTBAR, ItemTransferTag.INPUT, ItemTransferTag.STORAGE, ItemTransferTag.PLAYER_INV);
+        registerSlotTag(ItemTransferTag.PLAYER_INV, ItemTransferTag.INPUT, ItemTransferTag.STORAGE, ItemTransferTag.HOTBAR);
         registerSlotTag(ItemTransferTag.STORAGE, ItemTransferTag.PLAYER_INV, ItemTransferTag.HOTBAR);
     }
 

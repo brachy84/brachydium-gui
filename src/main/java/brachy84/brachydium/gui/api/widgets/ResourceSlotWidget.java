@@ -1,6 +1,6 @@
 package brachy84.brachydium.gui.api.widgets;
 
-import brachy84.brachydium.gui.api.IDrawable;
+import brachy84.brachydium.gui.api.ITexture;
 import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.api.Interactable;
 import brachy84.brachydium.gui.api.math.Size;
@@ -23,7 +23,7 @@ import java.util.List;
  */
 public abstract class ResourceSlotWidget<T> extends Widget implements Interactable {
 
-    private final List<IDrawable> textures = new ArrayList<>();
+    private final List<ITexture> textures = new ArrayList<>();
 
     @Override
     public void render(IGuiHelper helper, MatrixStack matrices, float delta) {
@@ -112,12 +112,12 @@ public abstract class ResourceSlotWidget<T> extends Widget implements Interactab
     /**
      * @return the fallback background to render if it has no sprites
      */
-    public abstract IDrawable getFallbackTexture();
+    public abstract ITexture getFallbackTexture();
 
     /**
      * @return the background sprites
      */
-    public List<IDrawable> getTextures() {
+    public List<ITexture> getTextures() {
         return textures;
     }
 
@@ -125,7 +125,7 @@ public abstract class ResourceSlotWidget<T> extends Widget implements Interactab
      * @param sprite to render
      * @return this, to use in a builder
      */
-    public ResourceSlotWidget<T> addBackgroundSprites(IDrawable... sprite) {
+    public ResourceSlotWidget<T> addBackgroundSprites(ITexture... sprite) {
         textures.addAll(Arrays.asList(sprite));
         return this;
     }

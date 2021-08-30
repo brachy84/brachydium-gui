@@ -9,7 +9,7 @@ import net.minecraft.util.Identifier;
  * Defines an area in a png image
  */
 public record TextureArea(Identifier path, float u0,
-                          float v0, float u1, float v1) implements IDrawable {
+                          float v0, float u1, float v1) implements ITexture {
 
     public TextureArea {
         if (!path.getPath().endsWith(".png")) {

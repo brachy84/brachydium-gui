@@ -1,6 +1,5 @@
 package brachy84.brachydium.gui.internal;
 
-import brachy84.brachydium.gui.BrachydiumGui;
 import brachy84.brachydium.gui.Networking;
 import brachy84.brachydium.gui.api.ISyncedWidget;
 import brachy84.brachydium.gui.api.Interactable;

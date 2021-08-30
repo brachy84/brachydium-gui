@@ -97,7 +97,7 @@ public interface IGuiHelper {
      * @param pos      top left corner
      * @param size     draw size
      */
-    void drawTexture(MatrixStack matrices, IDrawable texture, Pos2d pos, Size size);
+    void drawTexture(MatrixStack matrices, ITexture texture, Pos2d pos, Size size);
 
     /**
      * Draws a vanilla style tooltip

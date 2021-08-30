@@ -208,7 +208,7 @@ public final class Gui {
             this.margin = EdgeInset.ZERO;
         }
 
-        public Builder setBackground(IDrawable drawable) {
+        public Builder setBackground(ITexture drawable) {
             this.background = new SpriteWidget(drawable, size);
             return this;
         }

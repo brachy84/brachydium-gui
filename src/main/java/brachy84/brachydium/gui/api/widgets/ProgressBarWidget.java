@@ -32,7 +32,7 @@ public class ProgressBarWidget extends Widget {
         this.moveDirection = MoveDirection.RIGHT;
     }
 
-    public static ProgressBarWidget of(DoubleSupplier progress, IDrawable full, IDrawable empty) {
+    public static ProgressBarWidget of(DoubleSupplier progress, ITexture full, ITexture empty) {
         return new ProgressBarWidget(progress, new ProgressTexture(empty, full));
     }
 
