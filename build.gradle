@@ -53,8 +53,8 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// experimental item transfer api
-	modImplementation("net.fabricmc.fabric-api:fabric-api-lookup-api-v1:1.3.0+b246072f13")
-	modImplementation("net.fabricmc.fabric-api:fabric-transfer-api-v1:1.1.0-pre.04+648b8b6c18")
+	//modImplementation("net.fabricmc.fabric-api:fabric-api-lookup-api-v1:1.3.0+b246072f13")
+	//modImplementation("net.fabricmc.fabric-api:fabric-transfer-api-v1:1.1.0-pre.04+648b8b6c18")
 
 	// Fabric/Quilt Loom and Architectury's "forgeloom"
 	//modImplementation("dev.latvian.mods:kubejs-fabric:${project.kubejs_version}")

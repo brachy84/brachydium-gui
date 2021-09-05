@@ -307,10 +307,10 @@ public abstract class Widget {
     /**
      * Add Rei widgets to the list which represent together this widget
      *
-     * @param widgets list of rei widgets that represent this widget
      * @param bounds  the bounds of the recipe screen
      * @param reiPos  the new pos to use for rei
      */
-    public void getReiWidgets(List<me.shedaniel.rei.api.client.gui.widgets.Widget> widgets, AABB bounds, Pos2d reiPos) {
+    public List<me.shedaniel.rei.api.client.gui.widgets.Widget> getReiWidgets(AABB bounds, Pos2d reiPos) {
+        return new ArrayList<>();
     }
 }

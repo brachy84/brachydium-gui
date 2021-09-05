@@ -1,10 +1,10 @@
 package brachy84.brachydium.gui.internal;
 
 import brachy84.brachydium.gui.BrachydiumGui;
-import brachy84.brachydium.gui.UiFactoryRegistry;
 import brachy84.brachydium.gui.api.UIHolder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
@@ -12,9 +12,16 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.ApiStatus;
 
 public abstract class UIFactory<T extends UIHolder> {
+
+    public static final Registry<UIFactory> REGISTRY = FabricRegistryBuilder.createSimple(UIFactory.class, BrachydiumGui.id("ui_factories")).buildAndRegister();
+
+    public static void register(UIFactory<?> factory) {
+        Registry.register(REGISTRY, factory.getId(), factory);
+    }
 
     public static final Identifier UI_SYNC_ID = BrachydiumGui.id("modular_gui");
 
@@ -22,7 +29,7 @@ public abstract class UIFactory<T extends UIHolder> {
     }
 
     public boolean openUI(T uiHolder, PlayerEntity player) {
-        if(player instanceof ServerPlayerEntity)
+        if (player instanceof ServerPlayerEntity)
             return openUI(uiHolder, (ServerPlayerEntity) player);
         return uiHolder.hasUI();
     }
@@ -56,7 +63,7 @@ public abstract class UIFactory<T extends UIHolder> {
 
         public static void read(PacketByteBuf buf) {
             Identifier factoryId = buf.readIdentifier();
-            UIFactory<?> factory = UiFactoryRegistry.tryGetFactory(factoryId);
+            UIFactory<?> factory = REGISTRY.get(factoryId);//UiFactoryRegistry.tryGetFactory(factoryId);
             if (factory != null) {
                 UIHolder holder = factory.readHolderFromSyncData(buf);
                 MinecraftClient.getInstance().execute(() -> {

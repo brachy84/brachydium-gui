@@ -18,6 +18,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.ActionResult;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -245,8 +246,8 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
     }
 
     @Override
-    public void getReiWidgets(List<Widget> widgets, AABB bounds, Pos2d reiPos) {
-        //Pos2d reiPos = bounds.getTopLeft().add(getRelativePos());
+    public List<Widget> getReiWidgets(AABB bounds, Pos2d reiPos) {
+        List<Widget> widgets = new ArrayList<>();
         me.shedaniel.rei.api.client.gui.widgets.Slot slot = Widgets.createSlot(reiPos.add(new Pos2d(1, 1)).asReiPoint());
         slot.backgroundEnabled(false);
         if (tag == ItemTransferTag.INPUT || mark == 1) {
@@ -266,5 +267,6 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
             }
         }));
         widgets.add(render);
+        return widgets;
     }
 }

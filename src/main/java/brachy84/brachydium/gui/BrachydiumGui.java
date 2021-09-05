@@ -1,6 +1,7 @@
 package brachy84.brachydium.gui;
 
 import brachy84.brachydium.gui.internal.BlockEntityUiFactory;
+import brachy84.brachydium.gui.internal.UIFactory;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
@@ -24,6 +25,6 @@ public class BrachydiumGui implements ModInitializer {
     @Override
     public void onInitialize() {
         Networking.serverInit();
-        UiFactoryRegistry.register(BlockEntityUiFactory.INSTANCE);
+        UIFactory.register(BlockEntityUiFactory.INSTANCE);
     }
 }
