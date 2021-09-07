@@ -13,7 +13,7 @@ public final class AABB {
     public final float x0, x1, y0, y1;
     public final float width, height;
 
-    private AABB(float x0, float x1, float y0, float y1) {
+    public AABB(float x0, float x1, float y0, float y1) {
         this.x0 = Math.min(x0, x1);
         this.x1 = Math.max(x0, x1);
         this.y0 = Math.min(y0, y1);
