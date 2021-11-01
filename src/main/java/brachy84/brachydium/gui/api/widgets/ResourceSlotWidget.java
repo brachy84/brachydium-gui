@@ -1,9 +1,10 @@
 package brachy84.brachydium.gui.api.widgets;
 
 import brachy84.brachydium.gui.api.ITexture;
-import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.api.Interactable;
+import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
+import brachy84.brachydium.gui.api.GuiHelper;
 import brachy84.brachydium.gui.internal.Widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
@@ -26,43 +27,43 @@ public abstract class ResourceSlotWidget<T> extends Widget implements Interactab
     private final List<ITexture> textures = new ArrayList<>();
 
     @Override
-    public void render(IGuiHelper helper, MatrixStack matrices, float delta) {
+    public void render(MatrixStack matrices, Pos2d mousePos, float delta) {
         if(textures.size() > 0) {
-            textures.forEach(sprite -> helper.drawTexture(matrices, sprite, getPos(), getSize()));
+            textures.forEach(sprite -> GuiHelper.drawTexture(matrices, sprite, getPos(), getSize()));
         } else {
-            helper.drawTexture(matrices, getFallbackTexture(), getPos(), getSize());
+            GuiHelper.drawTexture(matrices, getFallbackTexture(), getPos(), getSize());
         }
 
         if(!isEmpty())
-            renderResource(helper, matrices);
-        if(isInBounds(helper.getMousePos())) {
-            renderHoveringOverlay(helper, matrices, delta);
+            renderResource(matrices, mousePos);
+        if(isInBounds(mousePos)) {
+            renderHoveringOverlay(matrices, delta);
         }
     }
 
     @Override
-    public void renderForeground(IGuiHelper helper, MatrixStack matrices, float delta) {
-        if(getGui().getCursor().isEmpty() && isInBounds(helper.getMousePos()) && !isEmpty())
-            renderTooltip(helper, matrices, delta);
+    public void renderForeground(MatrixStack matrices, Pos2d mousePos, float delta) {
+        if(getGui().getCursor().isEmpty() && isInBounds(mousePos) && !isEmpty())
+            renderTooltip(matrices, mousePos, delta);
     }
 
     @Environment(EnvType.CLIENT)
     @ApiStatus.OverrideOnly
-    public abstract void renderResource(IGuiHelper helper, MatrixStack matrices);
+    public abstract void renderResource(MatrixStack matrices, Pos2d mousePos);
 
     @Environment(EnvType.CLIENT)
     @ApiStatus.OverrideOnly
-    public void renderHoveringOverlay(IGuiHelper helper, MatrixStack matrices, float delta) {
+    public void renderHoveringOverlay(MatrixStack matrices, float delta) {
         RenderSystem.disableDepthTest();
         RenderSystem.colorMask(true, true, true, false);
-        helper.fillGradient(matrices, getPos().add(1, 1), new Size(16, 16), -2130706433, -2130706433);
+        GuiHelper.fillGradient(matrices, getPos().add(1, 1), new Size(16, 16), -2130706433, -2130706433);
         RenderSystem.colorMask(true, true, true, true);
         RenderSystem.enableDepthTest();
     }
 
     @Environment(EnvType.CLIENT)
     @ApiStatus.OverrideOnly
-    public abstract void renderTooltip(IGuiHelper helper, MatrixStack matrices, float delta);
+    public abstract void renderTooltip(MatrixStack matrices, Pos2d mousePos, float delta);
 
     /**
      * Called when the player tries to insert something

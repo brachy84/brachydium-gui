@@ -1,8 +1,8 @@
 package brachy84.brachydium.gui.internal;
 
 import brachy84.brachydium.gui.api.Draggable;
+import brachy84.brachydium.gui.api.GuiHelper;
 import brachy84.brachydium.gui.api.ITexture;
-import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.api.Interactable;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.widgets.ItemSlotWidget;
@@ -28,16 +28,15 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
     }
 
     @Override
-    public void render(IGuiHelper helper, MatrixStack matrices, float delta) {
+    public void render(MatrixStack matrices, Pos2d mousePos, float delta) {
         matrices.push();
         matrices.translate(0, 0, 500);
         if (!stack.isEmpty())
-            renderResource(helper, matrices);
+            renderResource(matrices, mousePos);
         if (draggable != null) {
-            Pos2d mousePos = helper.getMousePos();
             Pos2d draggablePos = ((Widget) draggable).getPos();
             matrices.translate(mousePos.x - draggablePos.x - clickedRelativPos.x, mousePos.y - draggablePos.y - clickedRelativPos.y, 0);
-            draggable.renderMovingState(helper, matrices, delta);
+            draggable.renderMovingState(matrices, mousePos, delta);
             if (draggable.shouldRenderChildren()) {
                 ((Widget) draggable).getChildren().forEach(widget -> widget.drawWidget(matrices, delta, mousePos, false));
                 ((Widget) draggable).getChildren().forEach(widget -> widget.drawWidget(matrices, delta, mousePos, true));
@@ -57,16 +56,16 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
     }
 
     @Override
-    public void renderResource(IGuiHelper helper, MatrixStack matrices) {
-        helper.drawItem(matrices, getResource(), helper.getMousePos().add(-8, -8));
+    public void renderResource(MatrixStack matrices, Pos2d mousePos) {
+        GuiHelper.drawItem(matrices, getResource(), mousePos.add(-8, -8));
     }
 
     @Override
-    public void renderForeground(IGuiHelper helper, MatrixStack matrices, float delta) {
+    public void renderForeground(MatrixStack matrices, Pos2d mousePos, float delta) {
     }
 
     @Override
-    public void renderTooltip(IGuiHelper helper, MatrixStack matrices, float delta) {
+    public void renderTooltip(MatrixStack matrices, Pos2d mousePos, float delta) {
     }
 
     @Override

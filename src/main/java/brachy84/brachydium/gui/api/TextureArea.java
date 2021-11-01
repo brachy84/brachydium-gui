@@ -57,10 +57,7 @@ public record TextureArea(Identifier path, float u0,
     }
 
     private float calcUV0(float oldV, float newV) {
-        if (oldV == 0) {
-            return oldV + newV;
-        }
-        return oldV + oldV * newV;
+        return oldV == 0.0F ? oldV + newV : oldV + oldV * newV;
     }
 
     @Override

@@ -9,14 +9,14 @@ public interface Draggable extends Interactable {
 
     /**
      * Get's called from the cursor
-     * Usually you just call {@link Widget#render(IGuiHelper, MatrixStack, float)}
+     * Usually you just call {@link Widget#render(MatrixStack, Pos2d, float)}
      * No need to translate
      *
-     * @param helper   draw helper
      * @param matrices matrix stack
+     * @param mousePos current mouse pos
      * @param delta    difference from last from
      */
-    void renderMovingState(IGuiHelper helper, MatrixStack matrices, float delta);
+    void renderMovingState(MatrixStack matrices, Pos2d mousePos, float delta);
 
     /**
      * @param button the mouse button that's holding down

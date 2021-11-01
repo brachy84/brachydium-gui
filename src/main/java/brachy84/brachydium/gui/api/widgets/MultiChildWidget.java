@@ -18,7 +18,7 @@ public abstract class MultiChildWidget extends Widget {
         }
     }
 
-    @ApiStatus.Internal
+    @ApiStatus.OverrideOnly
     public abstract void layoutChildren();
 
     /**

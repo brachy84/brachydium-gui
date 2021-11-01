@@ -159,7 +159,7 @@ public class Color {
      * @return the blue value
      */
     public int getBlue() {
-        return rgba >> 8 & 255;
+        return rgba & 255;
     }
 
     /**

@@ -1,7 +1,6 @@
 package brachy84.brachydium.gui.internal;
 
 import brachy84.brachydium.gui.api.Draggable;
-import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.api.WidgetTag;
 import brachy84.brachydium.gui.api.math.*;
 import brachy84.brachydium.gui.api.widgets.MultiChildWidget;
@@ -59,11 +58,11 @@ public abstract class Widget {
             throw new IllegalStateException("Widget is marked as 'mustHaveChild', but doesn't have a child");
         if (this instanceof Draggable)
             ((Draggable) this).setState(Draggable.State.IDLE);
-        validateSize();
         this.gui = gui;
         this.parent = Objects.requireNonNull(parent);
         this.layer = layer;
         this.initialised = true;
+        validateSize();
         rePosition();
         onInit();
         for (Widget widgetOld : children) {
@@ -78,20 +77,20 @@ public abstract class Widget {
             matrices.push();
             matrices.translate(0, 0, layer);
             if (foreground)
-                renderForeground(GuiHelper.create(layer, mousePos), matrices, delta);
+                renderForeground(matrices, mousePos, delta);
             else
-                render(GuiHelper.create(layer, mousePos), matrices, delta);
+                render(matrices, mousePos, delta);
             matrices.pop();
         }
         children.forEach(widget -> widget.drawWidget(matrices, delta, mousePos, foreground));
     }
 
     @ApiStatus.OverrideOnly
-    public void render(IGuiHelper helper, MatrixStack matrices, float delta) {
+    public void render(MatrixStack matrices, Pos2d mousePos, float delta) {
     }
 
     @ApiStatus.OverrideOnly
-    public void renderForeground(IGuiHelper helper, MatrixStack matrices, float delta) {
+    public void renderForeground(MatrixStack matrices, Pos2d mousePos, float delta) {
     }
 
     public void validateSize() {
@@ -187,12 +186,20 @@ public abstract class Widget {
         return this;
     }
 
+    public Widget setSize(float width, float height) {
+        return setSize(new Size(width, height));
+    }
+
     public Widget setPos(Pos2d pos) {
         this.relativePos = Objects.requireNonNull(pos);
         this.alignment = null;
         if (initialised)
             this.pos = parent.pos.add(relativePos);
         return this;
+    }
+
+    public Widget setPos(float x, float y) {
+        return setPos(new Pos2d(x, y));
     }
 
     public Widget setAbsolutePos(Pos2d pos) {

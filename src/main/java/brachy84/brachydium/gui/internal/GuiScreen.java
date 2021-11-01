@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class GuiScreen extends Screen implements GuiHelper {
+public class GuiScreen extends Screen {
 
     private final Gui gui;
     //private final Interactable[] interactables;
@@ -201,20 +201,6 @@ public class GuiScreen extends Screen implements GuiHelper {
 
     public Gui getGui() {
         return gui;
-    }
-
-    @Override
-    public float getZ() {
-        return 0;
-    }
-
-    @Override
-    public Pos2d getMousePos() {
-        return null;
-    }
-
-    @Override
-    public void setZ(float z) {
     }
 
     @Override

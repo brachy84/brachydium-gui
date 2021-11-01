@@ -54,9 +54,10 @@ public class SimpleFluidRenderer {
     }
 
     // This method is from REI FluidEntryStack class
-    public static void renderInGui(MatrixStack matrices, Fluid fluid, AABB bounds, float z) {
+    public static void renderInGui(MatrixStack matrices, Fluid fluid, AABB bounds) {
         FluidRenderingData renderingData = SimpleFluidRenderer.fromFluid(fluid);
         if (renderingData != null) {
+            float z = 0;
             Sprite sprite = renderingData.getSprite();
             int color = renderingData.getColor();
             int a = 255;

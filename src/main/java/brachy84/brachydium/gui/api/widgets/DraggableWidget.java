@@ -1,7 +1,6 @@
 package brachy84.brachydium.gui.api.widgets;
 
 import brachy84.brachydium.gui.api.Draggable;
-import brachy84.brachydium.gui.api.IGuiHelper;
 import brachy84.brachydium.gui.internal.Widget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;

@@ -1,13 +1,14 @@
 package brachy84.brachydium.gui.api.widgets;
 
 import brachy84.brachydium.gui.api.*;
-import brachy84.brachydium.gui.api.math.Alignment;
-import brachy84.brachydium.gui.api.math.EdgeInset;
-import brachy84.brachydium.gui.api.math.Pos2d;
-import brachy84.brachydium.gui.api.math.Size;
+import brachy84.brachydium.gui.api.math.*;
+import brachy84.brachydium.gui.api.GuiHelper;
 import brachy84.brachydium.gui.internal.Widget;
+import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import net.minecraft.client.util.math.MatrixStack;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.DoubleSupplier;
 
@@ -41,8 +42,12 @@ public class ProgressBarWidget extends Widget {
     }
 
     @Override
-    public void render(IGuiHelper helper, MatrixStack matrices, float delta) {
-        helper.drawTexture(matrices, texture.getEmpty(), getPos(), getSize());
+    public void render(MatrixStack matrices, Pos2d mousePos, float delta) {
+        drawBar(matrices, getPos());
+    }
+
+    private void drawBar(MatrixStack matrices, Pos2d pos) {
+        GuiHelper.drawTexture(matrices, texture.getEmpty(), pos, getSize());
         float u0 = 0, u1 = 1, v0 = 0, v1 = 1;
         float width = getSize().width(), height = getSize().height();
         switch (moveDirection) {
@@ -64,7 +69,7 @@ public class ProgressBarWidget extends Widget {
             }
         }
         TextureArea partFull = texture.getFull().getTexture().getSubArea(u0, v0, u1, v1);
-        helper.drawTexture(matrices, partFull, getPos().add(u0, v0), new Size(width, height));
+        GuiHelper.drawTexture(matrices, partFull, pos.add(u0, v0), new Size(width, height));
     }
 
     public ProgressBarWidget setMoveDirection(MoveDirection moveDirection) {
@@ -94,5 +99,15 @@ public class ProgressBarWidget extends Widget {
 
     public MoveDirection getMoveDirection() {
         return moveDirection;
+    }
+
+    @Override
+    public List<me.shedaniel.rei.api.client.gui.widgets.Widget> getReiWidgets(AABB bounds, Pos2d reiPos) {
+        List<me.shedaniel.rei.api.client.gui.widgets.Widget> widgets = new ArrayList<>();
+        me.shedaniel.rei.api.client.gui.widgets.Widget render = Widgets.createDrawableWidget(((helper, matrices, mouseX, mouseY, delta) -> {
+            drawBar(matrices, reiPos);
+        }));
+        widgets.add(render);
+        return widgets;
     }
 }

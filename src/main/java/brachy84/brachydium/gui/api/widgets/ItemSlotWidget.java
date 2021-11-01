@@ -4,7 +4,7 @@ import brachy84.brachydium.gui.api.*;
 import brachy84.brachydium.gui.api.math.AABB;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
-import brachy84.brachydium.gui.internal.GuiHelper;
+import brachy84.brachydium.gui.api.GuiHelper;
 import brachy84.brachydium.gui.internal.wrapper.IModifiableStorage;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
@@ -73,16 +73,16 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
     }
 
     @Override
-    public void renderResource(IGuiHelper helper, MatrixStack matrices) {
+    public void renderResource(MatrixStack matrices, Pos2d mousePos) {
         matrices.push();
         matrices.translate(-1, -1.5, 0);
-        helper.drawItem(matrices, getResource(), getPos().add(1, 1));
+        GuiHelper.drawItem(matrices, getResource(), getPos().add(1, 1));
         matrices.pop();
     }
 
     @Override
-    public void renderTooltip(IGuiHelper helper, MatrixStack matrices, float delta) {
-        getGui().getScreen().renderTooltip(matrices, getGui().getScreen().getTooltipFromItem(getResource()), getResource().getTooltipData(), (int) helper.getMousePos().x, (int) helper.getMousePos().y);
+    public void renderTooltip(MatrixStack matrices, Pos2d mousePos, float delta) {
+        getGui().getScreen().renderTooltip(matrices, getGui().getScreen().getTooltipFromItem(getResource()), getResource().getTooltipData(), (int) mousePos.x, (int) mousePos.y);
     }
 
     @Override
@@ -257,13 +257,12 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         }
         widgets.add(slot);
         Widget render = Widgets.createDrawableWidget(((helper, matrices, mouseX, mouseY, delta) -> {
-            GuiHelper guiHelper = GuiHelper.create(0, new Pos2d(mouseX, mouseY));
             if (getTextures().size() > 0) {
                 for (ITexture drawable : getTextures()) {
-                    guiHelper.drawTexture(matrices, drawable, reiPos, getSize());
+                    GuiHelper.drawTexture(matrices, drawable, reiPos, getSize());
                 }
             } else {
-                guiHelper.drawTexture(matrices, getFallbackTexture(), reiPos, getSize());
+                GuiHelper.drawTexture(matrices, getFallbackTexture(), reiPos, getSize());
             }
         }));
         widgets.add(render);
