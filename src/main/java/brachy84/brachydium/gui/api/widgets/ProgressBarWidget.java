@@ -62,19 +62,19 @@ public class ProgressBarWidget extends Widget implements ISyncedWidget {
         float width = getSize().width(), height = getSize().height();
         switch (moveDirection) {
             case RIGHT -> {
-                u1 = (float) progress.getAsDouble();
+                u1 = (float) currentProgress;
                 width *= u1;
             }
             case LEFT -> {
-                u0 = (float) (1 - progress.getAsDouble());
+                u0 = (float) (1 - currentProgress);
                 width *= 1 - u0;
             }
             case UP -> {
-                v0 = (float) (1 - progress.getAsDouble());
+                v0 = (float) (1 - currentProgress);
                 height *= 1 - v0;
             }
             case DOWN -> {
-                v1 = (float) progress.getAsDouble();
+                v1 = (float) currentProgress;
                 height *= v1;
             }
         }
