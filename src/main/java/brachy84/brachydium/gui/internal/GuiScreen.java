@@ -47,6 +47,11 @@ public class GuiScreen extends Screen {
     }
 
     @Override
+    public void tick() {
+        gui.tick();
+    }
+
+    @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         renderBackground(matrices);
         Pos2d pos = new Pos2d(mouseX, mouseY);

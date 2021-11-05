@@ -1,6 +1,7 @@
 package brachy84.brachydium.gui.api.widgets;
 
 import brachy84.brachydium.gui.api.Draggable;
+import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.internal.Widget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
@@ -29,7 +30,7 @@ public class DraggableWidget extends SingleChildWidget implements Draggable {
     }
 
     @Override
-    public void renderMovingState(IGuiHelper helper, MatrixStack matrices, float delta) {
+    public void renderMovingState(MatrixStack matrices, Pos2d mousePos, float delta) {
     }
 
     @Override

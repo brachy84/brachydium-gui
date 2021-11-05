@@ -1,5 +1,6 @@
 package brachy84.brachydium.gui.internal;
 
+import brachy84.brachydium.gui.BrachydiumGui;
 import brachy84.brachydium.gui.api.*;
 import brachy84.brachydium.gui.api.math.*;
 import brachy84.brachydium.gui.api.widgets.*;
@@ -88,6 +89,11 @@ public final class Gui {
 
     public void reBuild() {
         root.forAllChildren(Widget::rePosition);
+    }
+
+    @ApiStatus.Internal
+    public void tick() {
+        root.forAllChildren(Widget::tick);
     }
 
     public void close() {

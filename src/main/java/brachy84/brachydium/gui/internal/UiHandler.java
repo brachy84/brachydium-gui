@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -39,5 +40,10 @@ public class UiHandler {
         if(screen instanceof GuiScreen)
             return ((GuiScreen) screen).getGui();
         return null;
+    }
+
+    @ApiStatus.Internal
+    public static void tickGuis() {
+        SCREEN_MAP.values().forEach(Gui::tick);
     }
 }

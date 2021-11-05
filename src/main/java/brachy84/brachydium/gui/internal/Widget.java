@@ -138,6 +138,15 @@ public abstract class Widget {
     public void onDestroy() {
     }
 
+    /**
+     * Called on server and client each tick.
+     * Server and client do NOT tick at the same time. Sometimes server or client will tick twice and then the other will tick twice.
+     * So at the end both ticked the same amount +-1
+     */
+    @ApiStatus.OverrideOnly
+    public void tick() {
+    }
+
     //=================================================
     //  Builder methods
 
