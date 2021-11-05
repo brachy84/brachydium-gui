@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.ApiStatus;
@@ -26,7 +27,7 @@ public interface ISyncedWidget {
      * @param data to read
      */
     @ApiStatus.OverrideOnly
-    void readData(PacketByteBuf data);
+    void readData(boolean fromServer, PacketByteBuf data);
 
     /**
      * This methods handles data writing
@@ -35,7 +36,7 @@ public interface ISyncedWidget {
      * @param data to write to
      */
     @ApiStatus.OverrideOnly
-    void writeData(PacketByteBuf data);
+    void writeData(boolean fromServer, PacketByteBuf data);
 
     /**
      * Use this method to send the data
@@ -43,11 +44,13 @@ public interface ISyncedWidget {
      *
      * @param player to send data to
      */
-    default void sendToClient(ServerPlayerEntity player) {
+    default void sendToClient(PlayerEntity player) {
+        if(!(player instanceof ServerPlayerEntity))
+            throw new IllegalArgumentException("Can't send to client from client");
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeInt(UiHandler.getCurrentGui(player).findIdForSyncedWidget(this));
-        writeData(buf);
-        ServerPlayNetworking.send(player, Networking.WIDGET_UPDATE, buf);
+        writeData(true, buf);
+        ServerPlayNetworking.send((ServerPlayerEntity) player, Networking.WIDGET_UPDATE, buf);
     }
 
     /**
@@ -60,7 +63,7 @@ public interface ISyncedWidget {
         if (player != null) {
             PacketByteBuf buf = PacketByteBufs.create();
             buf.writeInt(UiHandler.getCurrentGuiClient().findIdForSyncedWidget(this));
-            writeData(buf);
+            writeData(false, buf);
             ClientPlayNetworking.send(Networking.WIDGET_UPDATE, buf);
         }
     }

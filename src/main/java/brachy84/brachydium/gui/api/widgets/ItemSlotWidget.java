@@ -63,12 +63,12 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
     }
 
     @Override
-    public void readData(PacketByteBuf data) {
+    public void readData(boolean fromServer, PacketByteBuf data) {
         setResource(data.readItemStack());
     }
 
     @Override
-    public void writeData(PacketByteBuf data) {
+    public void writeData(boolean fromServer, PacketByteBuf data) {
         data.writeItemStack(getResource());
     }
 

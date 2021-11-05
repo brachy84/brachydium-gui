@@ -1,15 +1,18 @@
 package brachy84.brachydium.gui.internal;
 
-import brachy84.brachydium.gui.BrachydiumGui;
 import brachy84.brachydium.gui.api.*;
 import brachy84.brachydium.gui.api.math.*;
-import brachy84.brachydium.gui.api.widgets.*;
+import brachy84.brachydium.gui.api.widgets.ItemSlotWidget;
+import brachy84.brachydium.gui.api.widgets.RootWidget;
+import brachy84.brachydium.gui.api.widgets.SpriteWidget;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
@@ -26,6 +29,10 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public final class Gui {
+
+    public static boolean isClient() {
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
+    }
 
     private static final ScreenWidget SCREEN_WIDGET = new ScreenWidget();
 
@@ -93,7 +100,8 @@ public final class Gui {
 
     @ApiStatus.Internal
     public void tick() {
-        root.forAllChildren(Widget::tick);
+        if (root.isInitialised())
+            root.forAllChildren(Widget::tick);
     }
 
     public void close() {
@@ -264,7 +272,7 @@ public final class Gui {
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 9; ++j) {
                     widget(new ItemSlotWidget(player.getInventory(), j + i * 9 + 9, pos)
-                        .addTag(ItemTransferTag.PLAYER_INV));
+                            .addTag(ItemTransferTag.PLAYER_INV));
                     pos = pos.add(18, 0);
                 }
                 pos = pos.add(-18 * 9, 18);
@@ -294,7 +302,7 @@ public final class Gui {
         public Builder bindHotbar(Pos2d pos) {
             for (int i = 0; i < 9; i++) {
                 widget(new ItemSlotWidget(player.getInventory(), i, pos)
-                    .addTag(ItemTransferTag.HOTBAR));
+                        .addTag(ItemTransferTag.HOTBAR));
                 pos = pos.add(18, 0);
             }
             return this;

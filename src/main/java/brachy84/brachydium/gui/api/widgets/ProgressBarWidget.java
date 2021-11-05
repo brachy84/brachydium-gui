@@ -2,10 +2,11 @@ package brachy84.brachydium.gui.api.widgets;
 
 import brachy84.brachydium.gui.api.*;
 import brachy84.brachydium.gui.api.math.*;
-import brachy84.brachydium.gui.api.GuiHelper;
+import brachy84.brachydium.gui.internal.Gui;
 import brachy84.brachydium.gui.internal.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.PacketByteBuf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +18,16 @@ import java.util.function.DoubleSupplier;
  * The move direction determines in which direction it fills up
  * seeAlso {@link ProgressTexture}, {@link MoveDirection}
  */
-public class ProgressBarWidget extends Widget {
+public class ProgressBarWidget extends Widget implements ISyncedWidget {
 
     private final ProgressTexture texture;
     private final DoubleSupplier progress;
     private MoveDirection moveDirection;
+    private double currentProgress;
 
     /**
      * @param progress should supply a double between 0 and 1 where 0 is empty and 1 is full
-     * @param texture texture to render
+     * @param texture  texture to render
      */
     public ProgressBarWidget(DoubleSupplier progress, ProgressTexture texture) {
         this.progress = Objects.requireNonNull(progress);
@@ -39,6 +41,14 @@ public class ProgressBarWidget extends Widget {
 
     public static ProgressBarWidget of(DoubleSupplier progress, TextureArea area) {
         return new ProgressBarWidget(progress, ProgressTexture.of(area));
+    }
+
+    @Override
+    public void tick() {
+        if (!Gui.isClient() && currentProgress != progress.getAsDouble()) {
+            currentProgress = progress.getAsDouble();
+            sendToClient(getGui().player);
+        }
     }
 
     @Override
@@ -109,5 +119,19 @@ public class ProgressBarWidget extends Widget {
         }));
         widgets.add(render);
         return widgets;
+    }
+
+    @Override
+    public void readData(boolean fromServer, PacketByteBuf data) {
+        if (fromServer) {
+            currentProgress = data.readDouble();
+        }
+    }
+
+    @Override
+    public void writeData(boolean fromServer, PacketByteBuf data) {
+        if (fromServer) {
+            data.writeDouble(currentProgress);
+        }
     }
 }

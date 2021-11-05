@@ -54,11 +54,11 @@ public class DraggableWidget extends SingleChildWidget implements Draggable {
     }
 
     @Override
-    public void readData(PacketByteBuf data) {
+    public void readData(boolean fromServer, PacketByteBuf data) {
     }
 
     @Override
-    public void writeData(PacketByteBuf data) {
+    public void writeData(boolean fromServer, PacketByteBuf data) {
     }
 
     @Override

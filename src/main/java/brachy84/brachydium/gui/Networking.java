@@ -15,9 +15,7 @@ public class Networking {
         ServerPlayNetworking.registerGlobalReceiver(Networking.WIDGET_UPDATE, ((server, player, handler, buf, responseSender) -> {
             Gui gui = UiHandler.getCurrentGui(player);
             ISyncedWidget syncedWidget = gui.findSyncedWidget(buf.readInt());
-            if (syncedWidget != null) {
-                syncedWidget.readData(buf);
-            }
+            syncedWidget.readData(false, buf);
         }));
 
         ServerPlayNetworking.registerGlobalReceiver(Networking.UI_CLOSE, ((server, player, handler, buf, responseSender) -> {
