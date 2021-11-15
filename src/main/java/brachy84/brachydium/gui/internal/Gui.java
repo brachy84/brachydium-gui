@@ -100,8 +100,10 @@ public final class Gui {
 
     @ApiStatus.Internal
     public void tick() {
-        if (root.isInitialised())
+        if (root.isInitialised()) {
+            cursorSlot.tick();
             root.forAllChildren(Widget::tick);
+        }
     }
 
     public void close() {
@@ -112,6 +114,10 @@ public final class Gui {
     public void render(MatrixStack matrices, Pos2d mousePos, float delta) {
         root.drawWidget(matrices, delta, mousePos, false);
         root.drawWidget(matrices, delta, mousePos, true);
+        ItemStack stack = getCursorStack();
+        if (!stack.isEmpty()) {
+            GuiHelper.drawItem(stack, mousePos.add(-8, -8));
+        }
         cursorSlot.drawWidget(matrices, delta, mousePos, false);
     }
 
@@ -174,11 +180,11 @@ public final class Gui {
     }
 
     public ItemStack getCursorStack() {
-        return getCursor().getResource();
+        return MinecraftClient.getInstance().player.currentScreenHandler.getCursorStack();
     }
 
     public void setCursorStack(ItemStack stack) {
-        getCursor().setResource(stack);
+        MinecraftClient.getInstance().player.currentScreenHandler.setCursorStack(stack);
     }
 
     public Size getGuiSize() {

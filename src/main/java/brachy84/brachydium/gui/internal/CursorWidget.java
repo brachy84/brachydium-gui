@@ -1,38 +1,30 @@
 package brachy84.brachydium.gui.internal;
 
 import brachy84.brachydium.gui.api.Draggable;
-import brachy84.brachydium.gui.api.GuiHelper;
-import brachy84.brachydium.gui.api.ITexture;
 import brachy84.brachydium.gui.api.Interactable;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.widgets.ItemSlotWidget;
-import brachy84.brachydium.gui.api.widgets.ResourceSlotWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.ActionResult;
 import org.jetbrains.annotations.Nullable;
 
-public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
+public final class CursorWidget extends Widget implements Interactable {
 
-    private ItemStack stack;
     @Nullable
     private Draggable draggable;
     private Pos2d clickedRelativPos;
 
     public CursorWidget() {
         setSize(ItemSlotWidget.SIZE);
-        stack = ItemStack.EMPTY;
     }
 
     @Override
     public void render(MatrixStack matrices, Pos2d mousePos, float delta) {
         matrices.push();
         matrices.translate(0, 0, 500);
-        if (!stack.isEmpty())
-            renderResource(matrices, mousePos);
         if (draggable != null) {
             Pos2d draggablePos = ((Widget) draggable).getPos();
             matrices.translate(mousePos.x - draggablePos.x - clickedRelativPos.x, mousePos.y - draggablePos.y - clickedRelativPos.y, 0);
@@ -46,38 +38,11 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
     }
 
     @Override
-    public void readData(boolean fromServer, PacketByteBuf data) {
-        setResource(data.readItemStack());
-    }
-
-    @Override
-    public void writeData(boolean fromServer, PacketByteBuf data) {
-        data.writeItemStack(getResource());
-    }
-
-    @Override
-    public void renderResource(MatrixStack matrices, Pos2d mousePos) {
-        GuiHelper.drawItem(matrices, getResource(), mousePos.add(-8, -8));
+    public void tick() {
     }
 
     @Override
     public void renderForeground(MatrixStack matrices, Pos2d mousePos, float delta) {
-    }
-
-    @Override
-    public void renderTooltip(MatrixStack matrices, Pos2d mousePos, float delta) {
-    }
-
-    @Override
-    public ItemStack getResource() {
-        return stack;
-    }
-
-    @Override
-    public boolean setResource(ItemStack resource) {
-        if (resource == null) return false;
-        stack = resource;
-        return true;
     }
 
     @Override
@@ -92,23 +57,13 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
         return getPos();
     }
 
-    @Override
-    public boolean isEmpty() {
-        return stack.isEmpty() && draggable == null;
-    }
-
-    @Override
-    public ITexture getFallbackTexture() {
-        return null;
-    }
-
     private <T extends Widget & Interactable> T getFocused() {
         return (T) getGui().getScreen().getFocusedWidget();
     }
 
     @Override
     public ActionResult onClick(Pos2d pos, int buttonId, boolean isDoubleClick) {
-        if (getFocused() instanceof Draggable draggable && isEmpty()) {
+        if (draggable == null && getFocused() instanceof Draggable draggable && getGui().getCursorStack().isEmpty()) {
             if (!draggable.onDragStart(buttonId))
                 return ActionResult.PASS;
             ((Widget) draggable).setEnabled(false);
@@ -120,12 +75,12 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
             Pos2d mousePos = getPos();
             boolean successful;
             Widget topWidget = null;
-            for(Widget widget : getGui().getMatchingWidgets(widget -> widget.isInBounds(mousePos))) {
-                if(topWidget == null) {
+            for (Widget widget : getGui().getMatchingWidgets(widget -> widget.isInBounds(mousePos))) {
+                if (topWidget == null) {
                     topWidget = widget;
                     continue;
                 }
-                if(widget.getLayer() > topWidget.getLayer())
+                if (widget.getLayer() > topWidget.getLayer())
                     topWidget = widget;
             }
             if (successful = draggable.canDropHere(topWidget, mousePos, getGui().getBounds().isInBounds(mousePos))) {
@@ -139,5 +94,15 @@ public final class CursorWidget extends ResourceSlotWidget<ItemStack> {
             return ActionResult.SUCCESS;
         }
         return ActionResult.PASS;
+    }
+
+    @Override
+    public void readData(boolean fromServer, PacketByteBuf data) {
+
+    }
+
+    @Override
+    public void writeData(boolean fromServer, PacketByteBuf data) {
+
     }
 }

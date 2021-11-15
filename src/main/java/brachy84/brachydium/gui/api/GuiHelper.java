@@ -50,7 +50,7 @@ public class GuiHelper {
     /**
      * Renders a {@link ItemStack} with damage bar and count
      */
-    public static void drawItem(MatrixStack matrices, ItemStack item, Pos2d pos) {
+    public static void drawItem(ItemStack item, Pos2d pos) {
         ItemRenderer ir = MinecraftClient.getInstance().getItemRenderer();
         ir.renderInGuiWithOverrides(item, (int) pos.x, (int) pos.y);
         ir.renderGuiItemOverlay(getTextRenderer(), item, (int) pos.x, (int) pos.y);

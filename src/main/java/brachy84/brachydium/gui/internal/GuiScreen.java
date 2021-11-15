@@ -21,7 +21,6 @@ import java.util.function.Predicate;
 public class GuiScreen extends Screen {
 
     private final Gui gui;
-    //private final Interactable[] interactables;
     private Interactable focused;
     private long lastClick = 0;
     private Interactable lastFocusedClick;
@@ -31,7 +30,6 @@ public class GuiScreen extends Screen {
         this.gui = gui;
         this.gui.setScreen(this);
         this.gui.init();
-        //interactables = gui.getInteractables();
     }
 
     @Override
