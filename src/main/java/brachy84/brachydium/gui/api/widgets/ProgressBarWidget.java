@@ -53,28 +53,28 @@ public class ProgressBarWidget extends Widget implements ISyncedWidget {
 
     @Override
     public void render(MatrixStack matrices, Pos2d mousePos, float delta) {
-        drawBar(matrices, getPos());
+        drawBar(matrices, getPos(), currentProgress);
     }
 
-    private void drawBar(MatrixStack matrices, Pos2d pos) {
+    private void drawBar(MatrixStack matrices, Pos2d pos, double progress) {
         GuiHelper.drawTexture(matrices, texture.getEmpty(), pos, getSize());
         float u0 = 0, u1 = 1, v0 = 0, v1 = 1;
         float width = getSize().width(), height = getSize().height();
         switch (moveDirection) {
             case RIGHT -> {
-                u1 = (float) currentProgress;
+                u1 = (float) progress;
                 width *= u1;
             }
             case LEFT -> {
-                u0 = (float) (1 - currentProgress);
+                u0 = (float) (1 - progress);
                 width *= 1 - u0;
             }
             case UP -> {
-                v0 = (float) (1 - currentProgress);
+                v0 = (float) (1 - progress);
                 height *= 1 - v0;
             }
             case DOWN -> {
-                v1 = (float) currentProgress;
+                v1 = (float) progress;
                 height *= v1;
             }
         }
@@ -115,7 +115,7 @@ public class ProgressBarWidget extends Widget implements ISyncedWidget {
     public List<me.shedaniel.rei.api.client.gui.widgets.Widget> getReiWidgets(AABB bounds, Pos2d reiPos) {
         List<me.shedaniel.rei.api.client.gui.widgets.Widget> widgets = new ArrayList<>();
         me.shedaniel.rei.api.client.gui.widgets.Widget render = Widgets.createDrawableWidget(((helper, matrices, mouseX, mouseY, delta) -> {
-            drawBar(matrices, reiPos);
+            drawBar(matrices, reiPos, progress.getAsDouble());
         }));
         widgets.add(render);
         return widgets;
