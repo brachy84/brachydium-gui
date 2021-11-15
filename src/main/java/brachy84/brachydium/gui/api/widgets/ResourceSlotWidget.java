@@ -28,6 +28,10 @@ public abstract class ResourceSlotWidget<T> extends Widget implements Interactab
 
     @Override
     public void render(MatrixStack matrices, Pos2d mousePos, float delta) {
+        // item renderer only accepts int as pos and you can not translate the item via matrices so i have to move the slot
+        // wtf mojank
+        matrices.push();
+        matrices.translate(0, -0.5, 0);
         if(textures.size() > 0) {
             textures.forEach(sprite -> GuiHelper.drawTexture(matrices, sprite, getPos(), getSize()));
         } else {
@@ -39,11 +43,12 @@ public abstract class ResourceSlotWidget<T> extends Widget implements Interactab
         if(isInBounds(mousePos)) {
             renderHoveringOverlay(matrices, delta);
         }
+        matrices.pop();
     }
 
     @Override
     public void renderForeground(MatrixStack matrices, Pos2d mousePos, float delta) {
-        if(getGui().getCursor().isEmpty() && isInBounds(mousePos) && !isEmpty())
+        if(getGui().getCursorStack().isEmpty() && isInBounds(mousePos) && !isEmpty())
             renderTooltip(matrices, mousePos, delta);
     }
 

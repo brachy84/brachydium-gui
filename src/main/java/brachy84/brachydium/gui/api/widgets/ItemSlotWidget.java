@@ -74,10 +74,7 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
 
     @Override
     public void renderResource(MatrixStack matrices, Pos2d mousePos) {
-        matrices.push();
-        matrices.translate(-1, -1.5, 0);
-        GuiHelper.drawItem(matrices, getResource(), getPos().add(1, 1));
-        matrices.pop();
+        GuiHelper.drawItem(getResource(), getPos().add(1, 1f));
     }
 
     @Override
@@ -213,10 +210,9 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
                 setCursorStack(newStack(slotStack, slotStack.getMaxCount()));
             }
         }
-        // lastly simply sync the slot and the cursor slot to the client
+        // lastly simply sync the slot to the server
         if (getGui().player instanceof ClientPlayerEntity) {
             sendToServer();
-            getGui().getCursor().sendToServer();
         }
         return ActionResult.SUCCESS;
     }
