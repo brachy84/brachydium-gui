@@ -1,14 +1,17 @@
 package brachy84.brachydium.gui.api.widgets;
 
-import brachy84.brachydium.gui.api.*;
+import brachy84.brachydium.gui.api.helpers.Interactable;
+import brachy84.brachydium.gui.api.helpers.ItemTransferTag;
+import brachy84.brachydium.gui.api.helpers.TransferStackHandler;
+import brachy84.brachydium.gui.api.helpers.WidgetTag;
 import brachy84.brachydium.gui.api.math.AABB;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
-import brachy84.brachydium.gui.api.GuiHelper;
-import brachy84.brachydium.gui.internal.wrapper.IModifiableStorage;
+import brachy84.brachydium.gui.api.rendering.GuiHelper;
+import brachy84.brachydium.gui.api.rendering.ITexture;
+import brachy84.brachydium.gui.api.rendering.TextureArea;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,13 +38,6 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
     private Predicate<ItemStack> canInsert;
     private ItemTransferTag tag;
     private int mark;
-
-    public ItemSlotWidget(IModifiableStorage<ItemVariant> itemSlot, Pos2d pos) {
-        this(() -> itemSlot.getResource().toStack((int) itemSlot.getAmount()),
-                stack -> itemSlot.setResource(ItemVariant.of(stack), stack.getCount()),
-                pos);
-        setInsertPredicate(stack -> itemSlot.canInsert(ItemVariant.of(stack)));
-    }
 
     public ItemSlotWidget(Inventory inv, int index, Pos2d pos) {
         this(() -> inv.getStack(index), stack -> inv.setStack(index, stack), pos);
@@ -98,7 +94,7 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         if (!isEmpty() && (!ItemStack.areItemsEqual(stack, origin) || !ItemStack.areNbtEqual(stack, origin)))
             return 0;
         int toInsert = Math.min(stack.getCount(), origin.getMaxCount() - origin.getCount());
-        if(toInsert == 0) return 0;
+        if (toInsert == 0) return 0;
         stack.setCount(origin.getCount() + toInsert);
         setResource(stack, Action.PUT);
         return toInsert;

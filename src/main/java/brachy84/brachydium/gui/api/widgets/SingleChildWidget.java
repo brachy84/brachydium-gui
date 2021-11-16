@@ -1,6 +1,6 @@
 package brachy84.brachydium.gui.api.widgets;
 
-import brachy84.brachydium.gui.internal.Widget;
+import brachy84.brachydium.gui.api.Widget;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class SingleChildWidget extends Widget {

@@ -1,11 +1,12 @@
-package brachy84.brachydium.gui.internal;
+package brachy84.brachydium.gui.api;
 
-import brachy84.brachydium.gui.api.Draggable;
-import brachy84.brachydium.gui.api.WidgetTag;
+import brachy84.brachydium.gui.api.helpers.Draggable;
+import brachy84.brachydium.gui.api.helpers.WidgetTag;
 import brachy84.brachydium.gui.api.math.*;
 import brachy84.brachydium.gui.api.widgets.MultiChildWidget;
 import brachy84.brachydium.gui.api.widgets.RootWidget;
 import brachy84.brachydium.gui.api.widgets.SingleChildWidget;
+import brachy84.brachydium.gui.internal.CursorWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

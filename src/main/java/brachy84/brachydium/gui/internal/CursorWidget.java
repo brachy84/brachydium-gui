@@ -1,7 +1,8 @@
 package brachy84.brachydium.gui.internal;
 
-import brachy84.brachydium.gui.api.Draggable;
-import brachy84.brachydium.gui.api.Interactable;
+import brachy84.brachydium.gui.api.Widget;
+import brachy84.brachydium.gui.api.helpers.Draggable;
+import brachy84.brachydium.gui.api.helpers.Interactable;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.widgets.ItemSlotWidget;
 import net.minecraft.client.MinecraftClient;

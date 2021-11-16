@@ -1,4 +1,4 @@
-package brachy84.brachydium.gui.api;
+package brachy84.brachydium.gui.api.rendering;
 
 public enum MoveDirection {
     RIGHT,

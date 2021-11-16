@@ -1,7 +1,7 @@
 package brachy84.brachydium.gui.api.widgets;
 
 import brachy84.brachydium.gui.api.math.EdgeInset;
-import brachy84.brachydium.gui.internal.Widget;
+import brachy84.brachydium.gui.api.Widget;
 
 public class MarginWidget extends SingleChildWidget {
 

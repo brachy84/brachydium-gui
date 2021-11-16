@@ -1,7 +1,7 @@
-package brachy84.brachydium.gui.api;
+package brachy84.brachydium.gui.api.helpers;
 
 import brachy84.brachydium.gui.Networking;
-import brachy84.brachydium.gui.internal.UiHandler;
+import brachy84.brachydium.gui.api.GuiHandler;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -48,7 +48,7 @@ public interface ISyncedWidget {
         if(!(player instanceof ServerPlayerEntity))
             throw new IllegalArgumentException("Can't send to client from client");
         PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeInt(UiHandler.getCurrentGui(player).findIdForSyncedWidget(this));
+        buf.writeInt(GuiHandler.getCurrentGui(player).findIdForSyncedWidget(this));
         writeData(true, buf);
         ServerPlayNetworking.send((ServerPlayerEntity) player, Networking.WIDGET_UPDATE, buf);
     }
@@ -62,7 +62,7 @@ public interface ISyncedWidget {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player != null) {
             PacketByteBuf buf = PacketByteBufs.create();
-            buf.writeInt(UiHandler.getCurrentGuiClient().findIdForSyncedWidget(this));
+            buf.writeInt(GuiHandler.getCurrentGuiClient().findIdForSyncedWidget(this));
             writeData(false, buf);
             ClientPlayNetworking.send(Networking.WIDGET_UPDATE, buf);
         }

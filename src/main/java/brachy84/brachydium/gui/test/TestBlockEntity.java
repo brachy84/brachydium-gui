@@ -1,13 +1,12 @@
 package brachy84.brachydium.gui.test;
 
-import brachy84.brachydium.gui.api.TextureArea;
+import brachy84.brachydium.gui.api.rendering.TextureArea;
 import brachy84.brachydium.gui.api.math.Alignment;
 import brachy84.brachydium.gui.api.math.EdgeInset;
-import brachy84.brachydium.gui.api.math.Size;
 import brachy84.brachydium.gui.api.widgets.DraggableWidget;
 import brachy84.brachydium.gui.api.widgets.SpriteWidget;
 import brachy84.brachydium.gui.internal.BlockEntityWithGui;
-import brachy84.brachydium.gui.internal.Gui;
+import brachy84.brachydium.gui.api.Gui;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;

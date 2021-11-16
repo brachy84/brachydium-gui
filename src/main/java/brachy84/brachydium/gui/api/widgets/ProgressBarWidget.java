@@ -1,9 +1,10 @@
 package brachy84.brachydium.gui.api.widgets;
 
-import brachy84.brachydium.gui.api.*;
+import brachy84.brachydium.gui.api.helpers.*;
 import brachy84.brachydium.gui.api.math.*;
-import brachy84.brachydium.gui.internal.Gui;
-import brachy84.brachydium.gui.internal.Widget;
+import brachy84.brachydium.gui.api.rendering.*;
+import brachy84.brachydium.gui.api.Gui;
+import brachy84.brachydium.gui.api.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;

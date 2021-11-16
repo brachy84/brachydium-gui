@@ -1,6 +1,6 @@
 package brachy84.brachydium.gui.mixin;
 
-import brachy84.brachydium.gui.internal.UiHandler;
+import brachy84.brachydium.gui.api.GuiHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.profiler.Profiler;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,7 +19,7 @@ public class MinecraftServerMixin {
     @Inject(method = "tickWorlds", at = @At("TAIL"))
     public void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
         profiler.push("server brachydium-gui tick");
-        UiHandler.tickGuis();
+        GuiHandler.tickGuis();
         profiler.pop();
     }
 }

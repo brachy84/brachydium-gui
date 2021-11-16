@@ -1,4 +1,4 @@
-package brachy84.brachydium.gui.api;
+package brachy84.brachydium.gui.api.helpers;
 
 import brachy84.brachydium.gui.api.math.Pos2d;
 import net.fabricmc.api.EnvType;

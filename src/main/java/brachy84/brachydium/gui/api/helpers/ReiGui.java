@@ -1,9 +1,9 @@
-package brachy84.brachydium.gui.api;
+package brachy84.brachydium.gui.api.helpers;
 
 import brachy84.brachydium.gui.api.math.AABB;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.widgets.ItemSlotWidget;
-import brachy84.brachydium.gui.internal.Gui;
+import brachy84.brachydium.gui.api.Gui;
 import com.google.common.util.concurrent.AtomicDouble;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.widgets.Slot;
@@ -20,7 +20,7 @@ public class ReiGui {
     private final List<Widget> widgets = new ArrayList<>();
     private final AABB bounds;
 
-    public ReiGui(Gui gui, Rectangle recipeBounds, Predicate<brachy84.brachydium.gui.internal.Widget> fluidSlotPredicate) {
+    public ReiGui(Gui gui, Rectangle recipeBounds, Predicate<brachy84.brachydium.gui.api.Widget> fluidSlotPredicate) {
         this(gui, gui.getBounds(), recipeBounds, fluidSlotPredicate);
     }
 
@@ -32,7 +32,7 @@ public class ReiGui {
      * @param recipeBounds       the bounds of the recipe display
      * @param fluidSlotPredicate returns if the widget is a fluid slot
      */
-    public ReiGui(Gui gui, AABB bounds, Rectangle recipeBounds, Predicate<brachy84.brachydium.gui.internal.Widget> fluidSlotPredicate) {
+    public ReiGui(Gui gui, AABB bounds, Rectangle recipeBounds, Predicate<brachy84.brachydium.gui.api.Widget> fluidSlotPredicate) {
         final AtomicDouble x0 = new AtomicDouble(0), x1 = new AtomicDouble(0), y0 = new AtomicDouble(0), y1 = new AtomicDouble(0);
         gui.init();
         gui.forEachWidget(widget -> {

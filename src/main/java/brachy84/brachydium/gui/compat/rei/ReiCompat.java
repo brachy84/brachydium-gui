@@ -1,12 +1,12 @@
 package brachy84.brachydium.gui.compat.rei;
 
-import brachy84.brachydium.gui.api.Interactable;
+import brachy84.brachydium.gui.api.helpers.Interactable;
 import brachy84.brachydium.gui.api.math.AABB;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.widgets.ItemSlotWidget;
-import brachy84.brachydium.gui.internal.Gui;
+import brachy84.brachydium.gui.api.Gui;
 import brachy84.brachydium.gui.internal.GuiScreen;
-import brachy84.brachydium.gui.internal.UiHandler;
+import brachy84.brachydium.gui.api.GuiHandler;
 import dev.architectury.event.CompoundEventResult;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.config.DisplayPanelLocation;
@@ -54,7 +54,7 @@ public class ReiCompat implements REIClientPlugin {
 
         @Override
         public boolean shouldRecalculateArea(DisplayPanelLocation location, Rectangle rectangle) {
-            Gui gui = UiHandler.getCurrentGuiClient();
+            Gui gui = GuiHandler.getCurrentGuiClient();
             if (gui == null) return false;
             return AABB.ofReiRectangle(rectangle).intersects(gui.getBounds());
         }

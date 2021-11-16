@@ -1,7 +1,7 @@
-package brachy84.brachydium.gui.internal;
+package brachy84.brachydium.gui.api;
 
 import brachy84.brachydium.gui.BrachydiumGui;
-import brachy84.brachydium.gui.api.UIHolder;
+import brachy84.brachydium.gui.internal.GuiScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
@@ -17,39 +17,49 @@ import org.jetbrains.annotations.ApiStatus;
 
 public abstract class UIFactory<T extends UIHolder> {
 
+    /**
+     * UIFactory Registry
+     */
     public static final Registry<UIFactory> REGISTRY = FabricRegistryBuilder.createSimple(UIFactory.class, BrachydiumGui.id("ui_factories")).buildAndRegister();
 
+    /**
+     * Registers a UIFactory
+     * @param factory factory to register
+     */
     public static void register(UIFactory<?> factory) {
         Registry.register(REGISTRY, factory.getId(), factory);
     }
 
+    /**
+     * Only used internally for syncing
+     */
     public static final Identifier UI_SYNC_ID = BrachydiumGui.id("modular_gui");
 
+    /**
+     * UIFactory should only be instantiated once
+     */
     protected UIFactory() {
     }
 
-    public boolean openUI(T uiHolder, PlayerEntity player) {
-        if (player instanceof ServerPlayerEntity)
-            return openUI(uiHolder, (ServerPlayerEntity) player);
-        return uiHolder.hasUI();
-    }
-
-    public final boolean openUI(T uiHolder, ServerPlayerEntity player) {
+    /**
+     * Opens a {@link Gui} and syncs it to client;
+     *
+     * @param uiHolder the gui holder
+     * @param player the player who opens the gui
+     * @return if the gui was successfully opened
+     */
+    public final boolean openUI(T uiHolder, PlayerEntity player) {
+        if(!(player instanceof ServerPlayerEntity)) {
+            throw new IllegalArgumentException("UIFactory#openUI() should only be called from the server!");
+        }
         if (!uiHolder.hasUI()) return false;
         BrachydiumGui.LOGGER.info("Building UI");
-        UiHandler.openGui(player, uiHolder.createUi(player));
+        GuiHandler.openGui((ServerPlayerEntity) player, uiHolder.createUi(player));
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeIdentifier(getId());
         writeHolderToSyncData(buf, uiHolder);
-        ServerPlayNetworking.send(player, UI_SYNC_ID, buf);
+        ServerPlayNetworking.send((ServerPlayerEntity) player, UI_SYNC_ID, buf);
         return true;
-    }
-
-    @ApiStatus.Internal
-    @Environment(EnvType.CLIENT)
-    protected final void openClientUi(UIHolder uiHolder) {
-        Gui gui = uiHolder.createUi(MinecraftClient.getInstance().player);
-        MinecraftClient.getInstance().setScreen(new GuiScreen(gui));
     }
 
     public abstract Identifier getId();
@@ -58,18 +68,4 @@ public abstract class UIFactory<T extends UIHolder> {
     public abstract T readHolderFromSyncData(PacketByteBuf syncData);
 
     public abstract void writeHolderToSyncData(PacketByteBuf syncData, T holder);
-
-    public static class SyncPacket {
-
-        public static void read(PacketByteBuf buf) {
-            Identifier factoryId = buf.readIdentifier();
-            UIFactory<?> factory = REGISTRY.get(factoryId);//UiFactoryRegistry.tryGetFactory(factoryId);
-            if (factory != null) {
-                UIHolder holder = factory.readHolderFromSyncData(buf);
-                MinecraftClient.getInstance().execute(() -> {
-                    factory.openClientUi(holder);
-                });
-            }
-        }
-    }
 }

@@ -1,5 +1,6 @@
 package brachy84.brachydium.gui.internal;
 
+import brachy84.brachydium.gui.api.UIFactory;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;

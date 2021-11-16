@@ -1,4 +1,4 @@
-package brachy84.brachydium.gui.api;
+package brachy84.brachydium.gui.api.rendering;
 
 import brachy84.brachydium.gui.api.math.AABB;
 import brachy84.brachydium.gui.api.math.Pos2d;

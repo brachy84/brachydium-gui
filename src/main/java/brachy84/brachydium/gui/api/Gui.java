@@ -1,10 +1,15 @@
-package brachy84.brachydium.gui.internal;
+package brachy84.brachydium.gui.api;
 
-import brachy84.brachydium.gui.api.*;
+import brachy84.brachydium.gui.api.helpers.*;
 import brachy84.brachydium.gui.api.math.*;
+import brachy84.brachydium.gui.api.rendering.GuiHelper;
+import brachy84.brachydium.gui.api.rendering.ITexture;
+import brachy84.brachydium.gui.api.rendering.TextureArea;
 import brachy84.brachydium.gui.api.widgets.ItemSlotWidget;
 import brachy84.brachydium.gui.api.widgets.RootWidget;
 import brachy84.brachydium.gui.api.widgets.SpriteWidget;
+import brachy84.brachydium.gui.internal.CursorWidget;
+import brachy84.brachydium.gui.internal.GuiScreen;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;

@@ -1,8 +1,10 @@
 package brachy84.brachydium.gui.internal;
 
 import brachy84.brachydium.gui.Networking;
-import brachy84.brachydium.gui.api.ISyncedWidget;
-import brachy84.brachydium.gui.api.Interactable;
+import brachy84.brachydium.gui.api.Gui;
+import brachy84.brachydium.gui.api.Widget;
+import brachy84.brachydium.gui.api.helpers.ISyncedWidget;
+import brachy84.brachydium.gui.api.helpers.Interactable;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;

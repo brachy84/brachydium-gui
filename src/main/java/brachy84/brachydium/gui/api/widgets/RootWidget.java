@@ -3,7 +3,7 @@ package brachy84.brachydium.gui.api.widgets;
 import brachy84.brachydium.gui.api.math.Alignment;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
-import brachy84.brachydium.gui.internal.Widget;
+import brachy84.brachydium.gui.api.Widget;
 
 public final class RootWidget extends MultiChildWidget {
 

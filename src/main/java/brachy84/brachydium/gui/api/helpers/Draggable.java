@@ -1,7 +1,7 @@
-package brachy84.brachydium.gui.api;
+package brachy84.brachydium.gui.api.helpers;
 
 import brachy84.brachydium.gui.api.math.Pos2d;
-import brachy84.brachydium.gui.internal.Widget;
+import brachy84.brachydium.gui.api.Widget;
 import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.Nullable;
 

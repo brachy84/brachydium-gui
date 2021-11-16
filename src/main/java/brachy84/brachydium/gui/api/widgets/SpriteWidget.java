@@ -1,11 +1,11 @@
 package brachy84.brachydium.gui.api.widgets;
 
-import brachy84.brachydium.gui.api.ITexture;
+import brachy84.brachydium.gui.api.rendering.ITexture;
 import brachy84.brachydium.gui.api.math.Alignment;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
-import brachy84.brachydium.gui.api.GuiHelper;
-import brachy84.brachydium.gui.internal.Widget;
+import brachy84.brachydium.gui.api.rendering.GuiHelper;
+import brachy84.brachydium.gui.api.Widget;
 import net.minecraft.client.util.math.MatrixStack;
 
 /**
