@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.8-SNAPSHOT'
+	id 'fabric-loom' version '0.9-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -11,36 +11,9 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-	maven {
-		// Shedaniel's maven (Architectury API)
-		url = "https://maven.architectury.dev"
-		content {
-			includeGroup "me.shedaniel"
-		}
-	}
 
 	// REI
 	maven { url "https://maven.shedaniel.me/" }
-
-	maven {
-		// saps.dev Maven (KubeJS and Rhino)
-		// you can also use Lat's Maven @ https://maven.latvian.dev/
-		url = "https://maven.saps.dev/minecraft"
-		content {
-			includeGroup "dev.latvian.mods"
-		}
-	}
-	// Astarre
-	maven {
-		url "https://storage.googleapis.com/devan-maven/"
-	}
-	maven {
-		name = "Technici4n"
-		url = "https://raw.githubusercontent.com/Technici4n/Technici4n-maven/master/"
-		content {
-			includeGroup "net.fabricmc.fabric-api"
-		}
-	}
 }
 
 dependencies {
@@ -51,17 +24,6 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-	// experimental item transfer api
-	//modImplementation("net.fabricmc.fabric-api:fabric-api-lookup-api-v1:1.3.0+b246072f13")
-	//modImplementation("net.fabricmc.fabric-api:fabric-transfer-api-v1:1.1.0-pre.04+648b8b6c18")
-
-	// Fabric/Quilt Loom and Architectury's "forgeloom"
-	//modImplementation("dev.latvian.mods:kubejs-fabric:${project.kubejs_version}")
-
-	// these two are unfortunately needed since fg.deobf doesn't respect transitive dependencies as of yet
-	//implementation "dev.latvian.mods:rhino:${rhino_version}"
-	//implementation fg.deobf("me.shedaniel:architectury-forge:${architectury_version}")
 
 	modImplementation "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
 }
