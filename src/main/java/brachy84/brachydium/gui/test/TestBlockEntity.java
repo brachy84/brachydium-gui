@@ -28,11 +28,6 @@ public class TestBlockEntity extends BlockEntityWithGui {
     }
 
     @Override
-    public @NotNull Identifier getUiId() {
-        return null;
-    }
-
-    @Override
     public @NotNull Gui createUi(PlayerEntity player) {
         return Gui.defaultBuilder(player)
                 .bindPlayerInventory(EdgeInset.all(7), Alignment.BottomCenter)
