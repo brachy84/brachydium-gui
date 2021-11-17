@@ -8,12 +8,14 @@ import brachy84.brachydium.gui.api.widgets.ItemSlotWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.ActionResult;
 import org.jetbrains.annotations.Nullable;
 
 public final class CursorWidget extends Widget implements Interactable {
 
+    private ItemStack stack = ItemStack.EMPTY;
     @Nullable
     private Draggable draggable;
     private Pos2d clickedRelativPos;
@@ -40,6 +42,26 @@ public final class CursorWidget extends Widget implements Interactable {
 
     @Override
     public void tick() {
+        if (getGui().isClient()) {
+            if (!ItemStack.areEqual(stack, MinecraftClient.getInstance().player.currentScreenHandler.getCursorStack())) {
+                stack = MinecraftClient.getInstance().player.currentScreenHandler.getCursorStack();
+                syncToServer(0, buf -> buf.writeItemStack(stack));
+            }
+        }
+    }
+
+    public void setCursorStack(ItemStack stack) {
+        this.stack = stack;
+        if (getGui().isClient()) {
+            MinecraftClient.getInstance().player.currentScreenHandler.setCursorStack(stack);
+            syncToServer(0, buf -> buf.writeItemStack(getGui().getCursorStack()));
+        } else {
+            syncToClient(getGui().player, 0, buf -> buf.writeItemStack(stack));
+        }
+    }
+
+    public ItemStack getCursorStack() {
+        return stack;
     }
 
     @Override
@@ -64,7 +86,7 @@ public final class CursorWidget extends Widget implements Interactable {
 
     @Override
     public ActionResult onClick(Pos2d pos, int buttonId, boolean isDoubleClick) {
-        if (draggable == null && getFocused() instanceof Draggable draggable && getGui().getCursorStack().isEmpty()) {
+        if (draggable == null && getFocused() instanceof Draggable draggable && getCursorStack().isEmpty()) {
             if (!draggable.onDragStart(buttonId))
                 return ActionResult.PASS;
             ((Widget) draggable).setEnabled(false);
@@ -99,9 +121,15 @@ public final class CursorWidget extends Widget implements Interactable {
 
     @Override
     public void readServerData(int id, PacketByteBuf buf) {
+        if (id == 0) {
+            this.stack = buf.readItemStack();
+            MinecraftClient.getInstance().player.currentScreenHandler.setCursorStack(stack);
+        }
     }
 
     @Override
     public void readClientData(int id, PacketByteBuf buf) {
+        if (id == 0)
+            this.stack = buf.readItemStack();
     }
 }

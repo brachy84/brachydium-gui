@@ -185,11 +185,11 @@ public final class Gui {
     }
 
     public ItemStack getCursorStack() {
-        return MinecraftClient.getInstance().player.currentScreenHandler.getCursorStack();
+        return getCursor().getCursorStack();
     }
 
     public void setCursorStack(ItemStack stack) {
-        MinecraftClient.getInstance().player.currentScreenHandler.setCursorStack(stack);
+        getCursor().setCursorStack(stack);
     }
 
     public Size getGuiSize() {
