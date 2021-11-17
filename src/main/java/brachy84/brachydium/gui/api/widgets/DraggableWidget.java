@@ -54,14 +54,6 @@ public class DraggableWidget extends SingleChildWidget implements Draggable {
     }
 
     @Override
-    public void readData(boolean fromServer, PacketByteBuf data) {
-    }
-
-    @Override
-    public void writeData(boolean fromServer, PacketByteBuf data) {
-    }
-
-    @Override
     public boolean mustHaveChild() {
         return true;
     }
@@ -74,5 +66,13 @@ public class DraggableWidget extends SingleChildWidget implements Draggable {
     public DraggableWidget setOnDragEnd(Consumer<Boolean> onDragEnd) {
         this.onDragEnd = Objects.requireNonNull(onDragEnd);
         return this;
+    }
+
+    @Override
+    public void readServerData(int id, PacketByteBuf buf) {
+    }
+
+    @Override
+    public void readClientData(int id, PacketByteBuf buf) {
     }
 }

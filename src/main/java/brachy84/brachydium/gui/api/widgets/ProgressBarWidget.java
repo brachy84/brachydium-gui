@@ -46,9 +46,9 @@ public class ProgressBarWidget extends Widget implements ISyncedWidget {
 
     @Override
     public void tick() {
-        if (!Gui.isClient() && currentProgress != progress.getAsDouble()) {
+        if (!getGui().isClient() && currentProgress != progress.getAsDouble()) {
             currentProgress = progress.getAsDouble();
-            sendToClient(getGui().player);
+            syncToClient(getGui().player, 0, buf -> buf.writeDouble(currentProgress));
         }
     }
 
@@ -123,16 +123,12 @@ public class ProgressBarWidget extends Widget implements ISyncedWidget {
     }
 
     @Override
-    public void readData(boolean fromServer, PacketByteBuf data) {
-        if (fromServer) {
-            currentProgress = data.readDouble();
-        }
+    public void readServerData(int id, PacketByteBuf buf) {
+        if(id == 0)
+            currentProgress = buf.readDouble();
     }
 
     @Override
-    public void writeData(boolean fromServer, PacketByteBuf data) {
-        if (fromServer) {
-            data.writeDouble(currentProgress);
-        }
+    public void readClientData(int id, PacketByteBuf buf) {
     }
 }

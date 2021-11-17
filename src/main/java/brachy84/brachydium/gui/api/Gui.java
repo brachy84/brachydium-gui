@@ -35,10 +35,6 @@ import java.util.function.Predicate;
 
 public final class Gui {
 
-    public static boolean isClient() {
-        return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
-    }
-
     private static final ScreenWidget SCREEN_WIDGET = new ScreenWidget();
 
     private static class ScreenWidget extends Widget {
@@ -78,6 +74,10 @@ public final class Gui {
 
     public static Builder defaultBuilder(PlayerEntity player) {
         return new Builder(player, new Size(176, 166)).setBackground(TextureArea.fullImage("brachydium", "gui/base/background"));
+    }
+
+    public boolean isClient() {
+        return player.world.isClient;
     }
 
     @ApiStatus.Internal

@@ -98,12 +98,10 @@ public final class CursorWidget extends Widget implements Interactable {
     }
 
     @Override
-    public void readData(boolean fromServer, PacketByteBuf data) {
-
+    public void readServerData(int id, PacketByteBuf buf) {
     }
 
     @Override
-    public void writeData(boolean fromServer, PacketByteBuf data) {
-
+    public void readClientData(int id, PacketByteBuf buf) {
     }
 }

@@ -59,13 +59,13 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
     }
 
     @Override
-    public void readData(boolean fromServer, PacketByteBuf data) {
-        setResource(data.readItemStack());
+    public void readServerData(int id, PacketByteBuf buf) {
     }
 
     @Override
-    public void writeData(boolean fromServer, PacketByteBuf data) {
-        data.writeItemStack(getResource());
+    public void readClientData(int id, PacketByteBuf buf) {
+        if(id == 0)
+            setResource(buf.readItemStack());
     }
 
     @Override
@@ -208,7 +208,7 @@ public class ItemSlotWidget extends ResourceSlotWidget<ItemStack> {
         }
         // lastly simply sync the slot to the server
         if (getGui().player instanceof ClientPlayerEntity) {
-            sendToServer();
+            syncToServer(0, buf -> buf.writeItemStack(getResource()));
         }
         return ActionResult.SUCCESS;
     }

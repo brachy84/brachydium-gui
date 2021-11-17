@@ -29,10 +29,12 @@ public class TestBlock extends Block implements BlockEntityProvider {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        BlockEntity be = world.getBlockEntity(pos);
-        if (be instanceof TestBlockEntity) {
-            if (BlockEntityUiFactory.INSTANCE.openUI((TestBlockEntity) be, player))
-                return ActionResult.SUCCESS;
+        if(!world.isClient) {
+            BlockEntity be = world.getBlockEntity(pos);
+            if (be instanceof TestBlockEntity) {
+                if (BlockEntityUiFactory.INSTANCE.openUI((TestBlockEntity) be, player))
+                    return ActionResult.SUCCESS;
+            }
         }
         return super.onUse(state, world, pos, player, hand, hit);
     }
