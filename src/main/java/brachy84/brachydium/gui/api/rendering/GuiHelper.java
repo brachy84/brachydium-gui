@@ -3,16 +3,19 @@ package brachy84.brachydium.gui.api.rendering;
 import brachy84.brachydium.gui.api.math.AABB;
 import brachy84.brachydium.gui.api.math.Pos2d;
 import brachy84.brachydium.gui.api.math.Size;
-import brachy84.brachydium.gui.internal.SimpleFluidRenderer;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRenderHandler;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.OrderedText;
@@ -60,15 +63,28 @@ public class GuiHelper {
      * Renders a {@link Fluid} with count
      * TODO improve
      */
-    public static void drawFluid(MatrixStack matrices, Fluid fluid, String amount, Pos2d pos, Size size) {
-        if (fluid == Fluids.EMPTY) return;
-        //setZ(getZ() + 50);
-        SimpleFluidRenderer.renderInGui(matrices, fluid, AABB.of(size, pos));
-        //matrices.translate(0, 0, getZ() + 5);
-        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-        getTextRenderer().draw(amount, pos.x + 19 - 2 - getTextRenderer().getWidth(amount), pos.y + 6 + 3, 16777215, true, matrices.peek().getModel(), immediate, false, 0, 15728880);
-        immediate.draw();
-        //setZ(getZ() - 50);
+    public static void drawFluid(MatrixStack matrices, FluidVariant variant, Pos2d pos, Size size) {
+        if (variant.isBlank()) return;
+        FluidVariantRenderHandler renderHandler = FluidVariantRendering.getHandlerOrDefault(variant.getFluid());
+
+        float x0 = pos.x, x1 = x0 + size.width(), y0 = pos.y, y1 = y0 + size.height();
+        Sprite sprite = renderHandler.getSprite(variant);
+        int color = renderHandler.getColor(variant, null, null);
+        int a = 255;
+        int r = (color >> 16 & 255);
+        int g = (color >> 8 & 255);
+        int b = (color & 255);
+        RenderSystem.setShaderTexture(0, SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        BufferBuilder bb = Tessellator.getInstance().getBuffer();
+        Matrix4f matrix = matrices.peek().getModel();
+        bb.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+        bb.vertex(matrix, x1, y0, 0).texture(sprite.getMaxU(), sprite.getMinV()).color(r, g, b, a).next();
+        bb.vertex(matrix, x0, y0, 0).texture(sprite.getMinU(), sprite.getMinV()).color(r, g, b, a).next();
+        bb.vertex(matrix, x0, y1, 0).texture(sprite.getMinU(), sprite.getMaxV()).color(r, g, b, a).next();
+        bb.vertex(matrix, x1, y1, 0).texture(sprite.getMaxU(), sprite.getMaxV()).color(r, g, b, a).next();
+        bb.end();
+        BufferRenderer.draw(bb);
     }
 
     /**

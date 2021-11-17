@@ -1,6 +1,5 @@
 package brachy84.brachydium.gui.api;
 
-import brachy84.brachydium.gui.api.Gui;
 import brachy84.brachydium.gui.internal.GuiScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
