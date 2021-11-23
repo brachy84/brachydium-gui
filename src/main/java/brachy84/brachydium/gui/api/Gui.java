@@ -16,8 +16,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
@@ -101,6 +99,10 @@ public final class Gui {
 
     public void reBuild() {
         root.forAllChildren(Widget::rePosition);
+    }
+
+    public boolean isInitialised() {
+        return root.isInitialised();
     }
 
     @ApiStatus.Internal
@@ -222,7 +224,7 @@ public final class Gui {
         private SpriteWidget background;
         private final Size size;
         private Alignment alignment;
-        private EdgeInset margin;
+        private EdgeInset offset;
         private Pos2d pos;
         private final List<Widget> children = new ArrayList<>();
 
@@ -230,7 +232,7 @@ public final class Gui {
             this.player = player;
             this.size = size;
             this.alignment = Alignment.Center;
-            this.margin = EdgeInset.ZERO;
+            this.offset = EdgeInset.ZERO;
         }
 
         public Builder setBackground(ITexture drawable) {
@@ -241,6 +243,11 @@ public final class Gui {
         public Builder setAlignment(Alignment alignment) {
             this.alignment = alignment;
             this.pos = null;
+            return this;
+        }
+
+        public Builder setOffset(EdgeInset offset) {
+            this.offset = offset;
             return this;
         }
 
@@ -300,8 +307,8 @@ public final class Gui {
          */
         public Builder bindHotbar(@Nullable EdgeInset margin, @NotNull Alignment alignment) {
             if (margin == null || margin.isZero())
-                return bindPlayerInventory(alignment.getAlignedPos(size, new Size(9 * 18, 18)));
-            return bindPlayerInventory(alignment.getAlignedPos(size, new Size(9 * 18, 18), margin));
+                return bindHotbar(alignment.getAlignedPos(size, new Size(9 * 18, 18)));
+            return bindHotbar(alignment.getAlignedPos(size, new Size(9 * 18, 18), margin));
         }
 
         /**
@@ -321,7 +328,7 @@ public final class Gui {
 
         public Gui build() {
             RootWidget root = alignment == null ? new RootWidget(size, pos) : new RootWidget(size, alignment);
-            root.setMargin(margin);
+            root.setMargin(offset);
             if (background != null)
                 root.child(background);
             root.children(children.toArray(new Widget[0]));

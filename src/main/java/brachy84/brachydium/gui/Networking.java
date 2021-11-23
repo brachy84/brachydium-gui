@@ -14,8 +14,10 @@ public class Networking {
     public static void serverInit() {
         ServerPlayNetworking.registerGlobalReceiver(Networking.WIDGET_UPDATE, ((server, player, handler, buf, responseSender) -> {
             Gui gui = GuiHandler.getCurrentGui(player);
-            ISyncedWidget syncedWidget = gui.findSyncedWidget(buf.readVarInt());
-            syncedWidget.readClientData(buf.readVarInt(), buf);
+            if(gui.isInitialised()) {
+                ISyncedWidget syncedWidget = gui.findSyncedWidget(buf.readVarInt());
+                syncedWidget.readClientData(buf.readVarInt(), buf);
+            }
         }));
 
         ServerPlayNetworking.registerGlobalReceiver(Networking.UI_CLOSE, ((server, player, handler, buf, responseSender) -> {

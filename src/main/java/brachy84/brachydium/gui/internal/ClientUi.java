@@ -36,8 +36,10 @@ public class ClientUi implements ClientModInitializer {
 
         ClientPlayNetworking.registerGlobalReceiver(Networking.WIDGET_UPDATE, ((client, handler, buf, responseSender) -> {
             Gui gui = GuiHandler.getCurrentGuiClient();
-            ISyncedWidget syncedWidget = gui.findSyncedWidget(buf.readVarInt());
-            syncedWidget.readServerData(buf.readVarInt(), buf);
+            if(gui.isInitialised()) {
+                ISyncedWidget syncedWidget = gui.findSyncedWidget(buf.readVarInt());
+                syncedWidget.readServerData(buf.readVarInt(), buf);
+            }
         }));
     }
 }
